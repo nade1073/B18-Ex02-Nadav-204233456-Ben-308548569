@@ -6,9 +6,7 @@ namespace Program
 {
     class UIUtilities
     {
-        public void nothing()
-            {
-            }
+ 
        public static eGameEndChoice getChoiseToContinuteTheGameFromClient()
        {
             bool isInputValid = false;
