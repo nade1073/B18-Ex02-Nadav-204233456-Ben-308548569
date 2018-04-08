@@ -24,10 +24,7 @@ namespace Program
 
         }
 
-        public void cosEmek()
-        {
-            Console.WriteLine("Ad Matai");
-        }
+
         //Getters
         public String GetPlayerName()
         {
