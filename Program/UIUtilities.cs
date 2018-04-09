@@ -44,7 +44,7 @@ namespace Program
             bool isValidMove = false;
             String moveFromClientS;
             SquareMove moveFromClient=null;
-            Console.WriteLine(i_Player.GetPlayerName() + "'s turn:");
+            Console.WriteLine(i_Player.PlayerName + "'s turn:");
             while (!isValidMove)
             {
                 do
@@ -147,7 +147,7 @@ namespace Program
             StringBuilder headLine = buildHeadLine(i_Size);
             StringBuilder equalsLine = builderEqualsLine(i_Size);
             board.AppendLine(headLine.ToString()).AppendLine(equalsLine.ToString());
-            char startRow = 'a';
+            char startRow = CheckerBoard.k_StartRow;
             for (int i=0;i< i_Size; i++)
             {
                 String rawForBoard = generateRawForBoard(i_FirstPlayer, i_SecondPlayer, startRow,i_Size, rawFormat);
@@ -160,7 +160,7 @@ namespace Program
         }
        public static void printResultOnScreen(Player i_FirstPlayer, Player i_SecondPlayer)
        {
-            string outPutMessage = String.Format("{0} has {1} points \n{2} has {3} poitns", i_FirstPlayer.GetPlayerName(), i_FirstPlayer.getScore(), i_SecondPlayer.GetPlayerName(), i_SecondPlayer.getScore());
+            string outPutMessage = String.Format("{0} has {1} points \n{2} has {3} poitns", i_FirstPlayer.PlayerName, i_FirstPlayer.Score, i_SecondPlayer.PlayerName, i_SecondPlayer.Score);
             System.Console.WriteLine(outPutMessage);
        }
        private static StringBuilder buildRawFormat(int i_Size)
@@ -174,7 +174,7 @@ namespace Program
         }
        private static StringBuilder buildHeadLine(int i_Size)
        {
-            char startLetter = 'A';
+            char startLetter = CheckerBoard.k_StartRow;
             StringBuilder raw = new StringBuilder();
             raw.Append("  ");
             for(int i=0;i<i_Size;i++)
@@ -198,7 +198,7 @@ namespace Program
        {
             List<String> paramsForRaw = new List<String>();
             List<Soldier> soldiersForEachRaw = new List<Soldier>();
-            char indexCol = 'A';
+            char indexCol = CheckerBoard.k_StartRow;
             int indexForList=0;
             soldiersForEachRaw.AddRange(i_FirstPlayer.getSoldierFromRaw(i_Raw));
             soldiersForEachRaw.AddRange(i_SecondPlayer.getSoldierFromRaw(i_Raw));
@@ -208,9 +208,9 @@ namespace Program
             {
                 if (indexForList < soldiersForEachRaw.Count)
                 {
-                    if (soldiersForEachRaw[indexForList].GetPlaceOnBoard().GetCol() == indexCol)
+                    if (soldiersForEachRaw[indexForList].PlaceOnBoard.Col == indexCol)
                     {
-                        paramsForRaw.Add(' ' + soldiersForEachRaw[indexForList].GetRepresentChar().ToString() + ' ');
+                        paramsForRaw.Add(' ' + soldiersForEachRaw[indexForList].CharRepresent.ToString() + ' ');
                         indexForList++;
                     }
                     else

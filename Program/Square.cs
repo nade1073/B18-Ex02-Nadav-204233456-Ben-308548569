@@ -4,47 +4,61 @@ namespace Program
    
     public class Square 
     {
-        private char row;
-        private char col;
+        private char m_Row;
+        private char m_Col;
 
-        public Square(char i_Row,char i_Col)
+        //Constructor
+        public Square(char i_Row, char i_Col)
         {
-            SetRow(i_Row);
-            SetCol(i_Col);
+            Row = i_Row;
+            Col = i_Col;
         }
-        public void SetRow(char i_Row)
+        //Getters&Setters
+        public char  Row 
         {
-            this.row = i_Row;
+            get
+            {
+                return m_Row;
+            }
+            set
+            {
+                m_Row = value;
+            }
         }
-        public void SetCol(char i_Col)
+        public char Col 
         {
-            this.col = i_Col;
+            get
+            {
+                return m_Col;
+            }
+            set
+            {
+                m_Col = value;
+            }
         }
-        public char GetCol()
-        {
-            return col;
-        }
-        public char GetRow()
-        {
-            return row;
-        }
-
+        
+        //Methods
         public override string ToString()
         {
-            return string.Format("{0}{1}",row,col);
+            return string.Format("{0}{1}",m_Col,m_Row);
         }
-        public override bool Equals(object obj)
+        public override bool Equals(object i_Obj)
         {
-            var other = obj as Square;
+            bool isEquals = true;
+            var other = i_Obj as Square;
             if (other == null)
-                return false;
-            if (row != other.row || col != other.col)
-                return false;
-            return true;
+            {
+                isEquals = false;
+            }
+            if (Row != other.Row || Col != other.Col)
+            {
+                isEquals = false;
+            }
+            return isEquals;
         }
         public override int GetHashCode()
         {
-            return this.row.GetHashCode();
+            return this.Row.GetHashCode();
         }
     }
 

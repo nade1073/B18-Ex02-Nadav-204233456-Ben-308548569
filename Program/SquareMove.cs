@@ -4,47 +4,77 @@ namespace Program
 {
     public class SquareMove : IEquatable<SquareMove>
     {
-        private Square m_fromSquare;
-        private Square m_toSquare;
-        private bool m_mustDoMove;
+        private Square m_FromSquare;
+        private Square m_ToSquare;
+        private bool m_MustDoMove;
 
-        public SquareMove()
+        //Getters and Setters
+        public bool MustDoMove
         {
-
-        }
-        public SquareMove(Square i_FromSquare,Square i_ToSquare,bool i_MustDoMove=false)
+            get
+            {
+                return m_MustDoMove;
+            }
+            set
+            {
+                m_MustDoMove = value;
+            }
+        } 
+        public Square ToSquare
         {
-            SetFromSquare(i_FromSquare);
-            SetToSquare(i_ToSquare);
-            SetMustDoMove(i_MustDoMove);
+            get
+            {
+                return m_ToSquare;
+            }
+            set
+            {
+                m_ToSquare = value;
+            }
         }
-
-        public static bool Parse(string moveFromClientS,out SquareMove o_SquareMove,eSizeBoard i_SizeOfBoard)
+        public Square FromSquare
+        {
+            get
+            {
+                return m_FromSquare;
+            }
+            set
+            {
+                m_FromSquare = value;
+            }
+        }
+        //Constructor
+        public SquareMove(Square i_FromSquare=null,Square i_ToSquare=null,bool i_MustDoMove=false)
+        {
+            FromSquare = i_FromSquare;
+            ToSquare = i_ToSquare;
+            MustDoMove = i_MustDoMove;
+        }
+        //Functions
+        public static bool Parse(string i_MoveFromClientS,out SquareMove o_SquareMove,eSizeBoard i_SizeOfBoard)
         {
             o_SquareMove = new SquareMove();
             bool isValidInput = true;
-            char[] arrayofChars = moveFromClientS.ToCharArray();
-            if (moveFromClientS.Length!=5 || arrayofChars[2] != '>')
+            char[] arrayofChars = i_MoveFromClientS.ToCharArray();
+            if (i_MoveFromClientS.Length!=5 || arrayofChars[2] != '>')
             {
                 isValidInput = false;
             }
-            else if (!validRange(i_SizeOfBoard,'A', arrayofChars[0], arrayofChars[3]))
+            else if (!validRange(i_SizeOfBoard,CheckerBoard.k_StartRow, arrayofChars[0], arrayofChars[3]))
             {
                 isValidInput = false;
             }
-            else if (!validRange(i_SizeOfBoard,'a', arrayofChars[1], arrayofChars[4]))
+            else if (!validRange(i_SizeOfBoard,CheckerBoard.k_StartRow, arrayofChars[1], arrayofChars[4]))
             {
                 isValidInput = false;
             }
 
-            if(isValidInput==true)
+            if(isValidInput)
             {
-                o_SquareMove.SetFromSquare(new Square(arrayofChars[1], arrayofChars[0]));
-                o_SquareMove.SetToSquare(new Square(arrayofChars[4], arrayofChars[3]));
+                o_SquareMove.FromSquare=new Square(arrayofChars[1], arrayofChars[0]);
+                o_SquareMove.ToSquare=new Square(arrayofChars[4], arrayofChars[3]);
             }
             return isValidInput;
         }
-
         private static bool validRange(eSizeBoard i_SizeOfBoard,char startRange,params char[] arrayToCheck)
         {
             bool validRows = true;
@@ -57,46 +87,18 @@ namespace Program
             }
             return validRows;
         }
-
-        //Setters
-        public void SetToSquare(Square i_ToSquare)
-        {
-            m_toSquare = i_ToSquare;
-        }
-        public void SetFromSquare(Square i_FromSquare)
-        {
-            m_fromSquare = i_FromSquare;
-        }
-        private void SetMustDoMove(bool i_MustDoMove)
-        {
-            m_mustDoMove = i_MustDoMove;
-        }
-        //Getters
-        public Square GetToSquare()
-        {
-            return m_toSquare;
-        }
-        public Square GetFromSquare()
-        {
-            return m_fromSquare;
-        }
-        public bool GetMustDoMove()
-        {
-            return m_mustDoMove;
-        }
         public override string ToString()
         {
-            return string.Format("{0}{1}{2}", m_fromSquare.ToString(), '>' , m_toSquare.ToString());
+            return string.Format("{0}{1}{2}", FromSquare.ToString(), '>' , ToSquare.ToString());
         }
-
-        public bool Equals(SquareMove other)
+        public bool Equals(SquareMove i_Other)
         {
             bool isEqual=true;
-            if(!this.m_fromSquare.Equals(other.m_fromSquare))
+            if(!this.FromSquare.Equals(i_Other.FromSquare))
             {
                 isEqual = false;
             }
-            else if(!this.m_toSquare.Equals(other.m_toSquare))
+            else if(!this.ToSquare.Equals(i_Other.ToSquare))
             {
                 isEqual = false;
             }
