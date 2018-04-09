@@ -7,8 +7,7 @@ namespace Program
     class UIUtilities
     {
        private static String m_MovementStatement=null;
-
-        public static string MovementStatement
+       public static string MovementStatement
         {
             get
             {
@@ -20,8 +19,7 @@ namespace Program
                 m_MovementStatement = value;
             }
         }
-
-        public static eGameEndChoice getChoiseToContinuteTheGameFromClient()
+       public static eGameEndChoice getChoiseToContinuteTheGameFromClient()
        {
             bool isInputValid = false;
             String input;
@@ -159,9 +157,11 @@ namespace Program
             Console.WriteLine(board);
 
         }
-       public static void printResultOnScreen(Player i_FirstPlayer, Player i_SecondPlayer)
+       public static void printResultOnScreen(Player i_FirstPlayer, Player i_SecondPlayer,int i_Size)
        {
-            string outPutMessage = String.Format("{0} has {1} points \n{2} has {3} poitns", i_FirstPlayer.PlayerName, i_FirstPlayer.Score, i_SecondPlayer.PlayerName, i_SecondPlayer.Score);
+            Ex02.ConsoleUtils.Screen.Clear();
+            PrintBoard(i_FirstPlayer, i_SecondPlayer,i_Size);
+            string outPutMessage = String.Format("{0} has {1} points \n{2} has {3} points", i_FirstPlayer.PlayerName, i_FirstPlayer.Score, i_SecondPlayer.PlayerName, i_SecondPlayer.Score);
             System.Console.WriteLine(outPutMessage);
        }
        private static StringBuilder buildRawFormat(int i_Size)

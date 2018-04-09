@@ -13,6 +13,7 @@ namespace Program
         public const char k_SecondPlayerKing = 'K';
         public const char k_FirstPlayerRegular = 'O';
         public const char k_SecondPlayerRegular = 'X';
+        public const char k_emptySolider = ' ';
         //Getters And Setters
         public char CharRepresent
         {
@@ -54,7 +55,6 @@ namespace Program
             PlaceOnBoard=i_PlaceOnBoard;
             CharRepresent = i_CharRepresent;
         }
-
 
         //Why compare to and not equal
         public int CompareTo(Soldier i_Other)
