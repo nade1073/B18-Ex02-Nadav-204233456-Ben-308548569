@@ -60,13 +60,25 @@ namespace Program
                 m_NumberOfPlayer = value;
             }
         }
+        public eTypeOfPlayer TypeOfPlayer
+        {
+            get
+            {
+                return m_TypeOfPlayer;
+            }
+
+            set
+            {
+                m_TypeOfPlayer = value;
+            }
+        }
 
         //Constructor
         public Player(String i_PlayerName,eTypeOfPlayer i_TypeOfPlayer,eNumberOfPlayer i_NumberOfPlayer,eSizeBoard i_BoardSize)
         {
             Score = 0;
             PlayerName = i_PlayerName;
-            m_TypeOfPlayer = i_TypeOfPlayer;
+            TypeOfPlayer = i_TypeOfPlayer;
             NumberOfPlayer = i_NumberOfPlayer;
             Soldiers = new List<Soldier>();
             generateSoliders(i_NumberOfPlayer, i_BoardSize);

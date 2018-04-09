@@ -6,8 +6,22 @@ namespace Program
 {
     class UIUtilities
     {
- 
-       public static eGameEndChoice getChoiseToContinuteTheGameFromClient()
+       private static String m_MovementStatement=null;
+
+        public static string MovementStatement
+        {
+            get
+            {
+                return m_MovementStatement;
+            }
+
+            set
+            {
+                m_MovementStatement = value;
+            }
+        }
+
+        public static eGameEndChoice getChoiseToContinuteTheGameFromClient()
        {
             bool isInputValid = false;
             String input;
@@ -34,43 +48,26 @@ namespace Program
             return choiseToReturn;
 
        }
-       public static String printCurrentMove(String i_PlayerName,char i_RepresentChar,SquareMove i_SquareMove)
+       public static void setCurrentMove(String i_PlayerName,char i_RepresentChar,SquareMove i_SquareMove)
         {
-          return String.Format("{0}'s move was ({1}) : {2}",i_PlayerName,i_RepresentChar,i_SquareMove.ToString());
+            MovementStatement=String.Format("{0}'s move was ({1}) : {2}",i_PlayerName,i_RepresentChar,i_SquareMove.ToString());
         }
-       public static SquareMove getValidSquareToMoveFromClient(Player i_Player,eSizeBoard i_SizeOfBoard,List<SquareMove> i_AvaiableVaildMoves,List<SquareMove> i_MustToDoMoves)
+       public static SquareMove getValidSquareToMoveFromClient(Player i_Player,eSizeBoard i_SizeOfBoard)
        {
-            bool quitFromGame=false;
-            bool isValidMove = false;
+ 
             String moveFromClientS;
             SquareMove moveFromClient=null;
             Console.WriteLine(i_Player.PlayerName + "'s turn:");
-            while (!isValidMove)
-            {
                 do
                 {
                     moveFromClientS = Console.ReadLine();
                     if (moveFromClientS.Equals("Q"))
                     {
-                        quitFromGame = true;
+                        moveFromClient = null;
                         break;
                     }
                 } while (!(SquareMove.Parse(moveFromClientS, out moveFromClient, i_SizeOfBoard)));
-
-                if(quitFromGame)
-                {
-                    break;
-                }
-                if(i_MustToDoMoves.Capacity>0)
-                {
-                    isValidMove = i_MustToDoMoves.Contains(moveFromClient);
-                }
-                else
-                {
-                    isValidMove = i_AvaiableVaildMoves.Contains(moveFromClient);
-                }
-            }
-            return moveFromClient;
+            return moveFromClient;         
        }
        public static eSizeBoard InitializePlayers(out Player o_FirstPlayer,out Player o_SecondPlayer)
         {
@@ -155,6 +152,10 @@ namespace Program
                 startRow++;
 
             }
+            if (MovementStatement != null)
+            {
+               board.AppendLine(MovementStatement);
+            }
             Console.WriteLine(board);
 
         }
@@ -174,7 +175,7 @@ namespace Program
         }
        private static StringBuilder buildHeadLine(int i_Size)
        {
-            char startLetter = CheckerBoard.k_StartRow;
+            char startLetter = CheckerBoard.k_StartCol;
             StringBuilder raw = new StringBuilder();
             raw.Append("  ");
             for(int i=0;i<i_Size;i++)
@@ -198,7 +199,7 @@ namespace Program
        {
             List<String> paramsForRaw = new List<String>();
             List<Soldier> soldiersForEachRaw = new List<Soldier>();
-            char indexCol = CheckerBoard.k_StartRow;
+            char indexCol = CheckerBoard.k_StartCol;
             int indexForList=0;
             soldiersForEachRaw.AddRange(i_FirstPlayer.getSoldierFromRaw(i_Raw));
             soldiersForEachRaw.AddRange(i_SecondPlayer.getSoldierFromRaw(i_Raw));
