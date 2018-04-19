@@ -7,6 +7,10 @@ namespace Program
     class UIUtilities
     {
        private static String m_MovementStatement=null;
+       public static void initializeParameters()
+        {
+            m_MovementStatement = null;
+        }
        public static string MovementStatement
         {
             get

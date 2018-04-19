@@ -56,7 +56,6 @@ namespace Program
             CharRepresent = i_CharRepresent;
         }
 
-        //Why compare to and not equal
         public int CompareTo(Soldier i_Other)
         {
             return this.m_PlaceOnBoard.Col.CompareTo(i_Other.m_PlaceOnBoard.Col);

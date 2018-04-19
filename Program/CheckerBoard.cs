@@ -17,8 +17,28 @@ namespace Program
 
         public const char k_StartRow = 'a';
         public const char k_StartCol = 'A';
-        public readonly char r_EndRow;
-        public readonly char r_EndCol;
+        private readonly char r_EndRow;
+        private readonly char r_EndCol;
+
+        private const int k_MoveUp = -1;
+        private const int k_MoveDown = -1;
+        private const int k_MoveRight = 1;
+        private const int k_MoveLeft = -1;
+
+        public char EndRow
+        {
+            get
+            {
+                return r_EndRow;
+            }
+        }
+        public char EndCol
+        {
+            get
+            {
+                return r_EndCol;
+            }
+        }
 
         public CheckerBoard(Player i_FirstPlayer, Player i_SecondPlayer, eSizeBoard i_SizeOfBoard)
         {
@@ -57,17 +77,17 @@ namespace Program
         private void caclculateResultGame()
         {
             Player firstPlayer = getPlayer(eNumberOfPlayer.First);
-            Player secondplayer = getPlayer(eNumberOfPlayer.Second);
+            Player secondPlayer = getPlayer(eNumberOfPlayer.Second);
             switch (m_gameStatus)
             {
                 case eGameStatus.FirstPlayerWon:
                     {
-                        calculateAndSetPoints(firstPlayer, secondplayer);
+                        calculateAndSetPoints(firstPlayer, secondPlayer);
                         break;
                     }
                 case eGameStatus.SecondPlayerWon:
                     {
-                        calculateAndSetPoints(secondplayer, firstPlayer);
+                        calculateAndSetPoints(secondPlayer, firstPlayer);
                         break;
                     }
             }
@@ -83,23 +103,16 @@ namespace Program
         private void nextTurn()
         {
             List<SquareMove> mustToDoMoves = new List<SquareMove>();
-            List<SquareMove> avaiableVaildMoves = generateValidMovesOfPlayer(m_currentPlayer);
-            if (!checkValidMove(avaiableVaildMoves))
+            List<SquareMove> availableVaildMoves = generateValidMovesOfPlayer(m_currentPlayer);
+            if (!checkValidMove(availableVaildMoves))
             {
                 determineResultGame();
             }
             else
             {
-                SquareMove playerChoise;
-                initializeForMustMoves(avaiableVaildMoves, ref mustToDoMoves);
-                if (m_currentPlayer.TypeOfPlayer == eTypeOfPlayer.Human)
-                {
-                     playerChoise = generateSquareToMoveHuman(m_currentPlayer, m_sizeOfBoard, avaiableVaildMoves, mustToDoMoves);
-                }
-                else
-                {
-                    playerChoise = generateSquareToMoveComputer(avaiableVaildMoves, mustToDoMoves);
-                }
+                
+                initializeForMustMoves(availableVaildMoves, ref mustToDoMoves);
+                SquareMove playerChoise = generateSquareToMove(availableVaildMoves, mustToDoMoves);
                 if (playerChoise == null)
                 {
                     m_gameStatus = eGameStatus.QExit;
@@ -110,6 +123,19 @@ namespace Program
                 }
             }
 
+        }
+        private SquareMove generateSquareToMove(List<SquareMove> i_AvailableVaildMoves, List<SquareMove> i_MustToDoMoves)
+        {
+            SquareMove playerChoise;
+            if (m_currentPlayer.TypeOfPlayer == eTypeOfPlayer.Human)
+            {
+                playerChoise = generateSquareToMoveHuman(m_currentPlayer, m_sizeOfBoard, i_AvailableVaildMoves, i_MustToDoMoves);
+            }
+            else
+            {
+                playerChoise = generateSquareToMoveComputer(i_AvailableVaildMoves, i_MustToDoMoves);
+            }
+            return playerChoise;
         }
         private SquareMove generateSquareToMoveComputer(List<SquareMove> i_AvaiableVaildMoves, List<SquareMove> i_MustToDoMoves)
         {
@@ -179,34 +205,33 @@ namespace Program
         private List<SquareMove> generateValidMovesOfPlayer(Player i_Player)
         {
             List<SquareMove> validMoves = new List<SquareMove>();
-            List<Soldier> currentPlayerSoldiers = i_Player.Soldiers;
-            foreach (Soldier currentSoldier in currentPlayerSoldiers)
+            foreach (Soldier currentSoldier in i_Player.Soldiers)
             {
                 validMoves.AddRange(getValidMoveOfSolider(currentSoldier));
             }
             return validMoves;
 
         }
-        private List<SquareMove> getValidMoveOfSolider(Soldier i_CurrentSoldier)
+        private List<SquareMove> getValidMoveOfSolider(Soldier i_Soldier)
         {
             List<SquareMove> validMoves = new List<SquareMove>();
-            switch (i_CurrentSoldier.CharRepresent)
+            switch (i_Soldier.CharRepresent)
             {
                 case Soldier.k_SecondPlayerRegular:
                     {
-                        validMoves.AddRange(getValidMovesOfCurrentSoldierUpOrDown(i_CurrentSoldier, eUpOrDown.Up));
+                        validMoves.AddRange(getValidMovesOfCurrentSoldierUpOrDown(i_Soldier,k_MoveUp));
                         break;
                     }
                 case Soldier.k_FirstPlayerRegular:
                     {
-                        validMoves.AddRange(getValidMovesOfCurrentSoldierUpOrDown(i_CurrentSoldier, eUpOrDown.Down));
+                        validMoves.AddRange(getValidMovesOfCurrentSoldierUpOrDown(i_Soldier, k_MoveDown));
                         break;
                     }
                 case Soldier.k_FirstPlayerKing:
                 case Soldier.k_SecondPlayerKing:
                     {
-                        validMoves.AddRange(getValidMovesOfCurrentSoldierUpOrDown(i_CurrentSoldier, eUpOrDown.Down));
-                        validMoves.AddRange(getValidMovesOfCurrentSoldierUpOrDown(i_CurrentSoldier, eUpOrDown.Up));
+                        validMoves.AddRange(getValidMovesOfCurrentSoldierUpOrDown(i_Soldier, k_MoveDown));
+                        validMoves.AddRange(getValidMovesOfCurrentSoldierUpOrDown(i_Soldier, k_MoveUp));
                         break;
                     }
 
@@ -229,10 +254,10 @@ namespace Program
             }
             return charRepresentPlayer;
         }
-        private SquareMove getVaildMoveFromSpesificSide(Soldier i_CurrentSolider, eUpOrDown i_RowMove, eRightOrLeft i_ColMove)
+        private SquareMove getVaildMoveFromSpesificSide(Soldier i_CurrentSolider, int i_RowMoveUpOrDown, int i_ColMoveRightOrLeft)
         {
-            char kingOfCurrentPlayer = Soldier.k_emptySolider;
-            char regularOfCurrentPlayer = Soldier.k_emptySolider;
+            char? kingOfCurrentPlayer = null;
+            char? regularOfCurrentPlayer = null;
             switch (m_currentPlayer.NumberOfPlayer)
             {
                 case eNumberOfPlayer.First:
@@ -248,20 +273,22 @@ namespace Program
                         break;
                     }
             }
-            SquareMove returnFinalSquareToMove=null;
-            Square squareToMove = new Square((char)(i_CurrentSolider.PlaceOnBoard.Row + i_RowMove), (char)(i_CurrentSolider.PlaceOnBoard.Col + i_ColMove));
+            SquareMove returnFinalSquareToMove = null;
+            Square squareToMove = new Square((char)(i_CurrentSolider.PlaceOnBoard.Row + i_RowMoveUpOrDown), (char)(i_CurrentSolider.PlaceOnBoard.Col + i_ColMoveRightOrLeft));
             char soliderCharOfSquare = whoIsInSquare(squareToMove);
+            //If the square is empty-> move to this square
             if (soliderCharOfSquare == Soldier.k_emptySolider)
             {
-                returnFinalSquareToMove = new SquareMove((i_CurrentSolider.PlaceOnBoard), (squareToMove));
+                returnFinalSquareToMove = new SquareMove(i_CurrentSolider.PlaceOnBoard, squareToMove);
             }
+            //If the square is occupied and have the other player solider -> check if he can eat
             else if (soliderCharOfSquare != kingOfCurrentPlayer && soliderCharOfSquare != regularOfCurrentPlayer)
             {
-                if (i_RowMove == eUpOrDown.Down && i_CurrentSolider.PlaceOnBoard.Row < r_EndRow-1 || i_RowMove == eUpOrDown.Up && i_CurrentSolider.PlaceOnBoard.Row > k_StartRow+1)
+                if (i_RowMoveUpOrDown == k_MoveDown && i_CurrentSolider.PlaceOnBoard.Row < EndRow-1 || i_RowMoveUpOrDown == k_MoveUp && i_CurrentSolider.PlaceOnBoard.Row > k_StartRow+1)
                 {
-                    if ((i_ColMove == eRightOrLeft.Left && i_CurrentSolider.PlaceOnBoard.Col > k_StartCol+1) || (i_ColMove == eRightOrLeft.Right && i_CurrentSolider.PlaceOnBoard.Col < (r_EndCol-1)))
+                    if ((i_ColMoveRightOrLeft == k_MoveLeft && i_CurrentSolider.PlaceOnBoard.Col > k_StartCol+1) || (i_ColMoveRightOrLeft == k_MoveRight && i_CurrentSolider.PlaceOnBoard.Col < (EndCol-1)))
                     {
-                        squareToMove = new Square((char)(i_CurrentSolider.PlaceOnBoard.Row + (int)i_RowMove * 2), (char)(i_CurrentSolider.PlaceOnBoard.Col + (int)i_ColMove * 2));
+                        squareToMove = new Square((char)(i_CurrentSolider.PlaceOnBoard.Row + i_RowMoveUpOrDown * 2), (char)(i_CurrentSolider.PlaceOnBoard.Col + i_ColMoveRightOrLeft * 2));
                         soliderCharOfSquare = whoIsInSquare(squareToMove);
                         if (soliderCharOfSquare == Soldier.k_emptySolider)
                         {
@@ -272,24 +299,24 @@ namespace Program
             }
             return returnFinalSquareToMove;
         }
-        private List<SquareMove> getValidMovesOfCurrentSoldierUpOrDown(Soldier i_CurrentSolider, eUpOrDown i_RowMove)
+        private List<SquareMove> getValidMovesOfCurrentSoldierUpOrDown(Soldier i_CurrentSolider, int i_RowMoveUpOrDown)
         {
             List<SquareMove> tempVaildMoves = new List<SquareMove>();
             SquareMove tempMoveRight;
             SquareMove tempMoveLeft;
-            if (i_RowMove == eUpOrDown.Down && i_CurrentSolider.PlaceOnBoard.Row < (r_EndRow) || i_RowMove == eUpOrDown.Up && i_CurrentSolider.PlaceOnBoard.Row > CheckerBoard.k_StartRow)
+            if (i_RowMoveUpOrDown == k_MoveDown && i_CurrentSolider.PlaceOnBoard.Row < (EndRow) || i_RowMoveUpOrDown == k_MoveUp && i_CurrentSolider.PlaceOnBoard.Row > CheckerBoard.k_StartRow)
             {
-                if (i_CurrentSolider.PlaceOnBoard.Col < (((char)m_sizeOfBoard - 1) + CheckerBoard.k_StartCol))
+                if (i_CurrentSolider.PlaceOnBoard.Col < EndCol)
                 {
-                    tempMoveRight = getVaildMoveFromSpesificSide(i_CurrentSolider, i_RowMove, eRightOrLeft.Right);
+                    tempMoveRight = getVaildMoveFromSpesificSide(i_CurrentSolider, i_RowMoveUpOrDown,k_MoveRight);
                     if (tempMoveRight != null)
                     {
                         tempVaildMoves.Add(tempMoveRight);
                     }
                 }
-                if (i_CurrentSolider.PlaceOnBoard.Col != CheckerBoard.k_StartCol)
+                if (i_CurrentSolider.PlaceOnBoard.Col > CheckerBoard.k_StartCol)
                 {
-                    tempMoveLeft = getVaildMoveFromSpesificSide(i_CurrentSolider, i_RowMove, eRightOrLeft.Left);
+                    tempMoveLeft = getVaildMoveFromSpesificSide(i_CurrentSolider, i_RowMoveUpOrDown, k_MoveLeft);
                     if (tempMoveLeft != null)
                     {
                         tempVaildMoves.Add(tempMoveLeft);
@@ -312,7 +339,7 @@ namespace Program
             }
         }
         private void swapPlayers()
-        {
+        { 
             Player tempPlayer = m_currentPlayer;
             m_currentPlayer = m_otherPlayer;
             m_otherPlayer = tempPlayer;
@@ -352,7 +379,7 @@ namespace Program
             }
             else if (currentSoldier.CharRepresent == Soldier.k_FirstPlayerRegular)
             {
-                if (currentSoldier.PlaceOnBoard.Row == (char)(CheckerBoard.k_StartRow + m_sizeOfBoard - 1))
+                if (currentSoldier.PlaceOnBoard.Row == EndRow)
                 {
                     currentSoldier.CharRepresent = Soldier.k_FirstPlayerKing;
                     currentSoldier.TypeOfSoldier = eSoldierType.King;
@@ -448,7 +475,7 @@ namespace Program
             m_gameStatus = eGameStatus.ContinueGame;
             m_isSoliderNeedToEatNextTurn = false;
             m_soliderThatNeedToEatNextTurn = null;
-            UIUtilities.MovementStatement = null;
+            UIUtilities.initializeParameters();
         }
     }
 }

@@ -50,11 +50,9 @@
     <Compile Include="eGameEndChoice.cs" />
     <Compile Include="eGameStatus.cs" />
     <Compile Include="eNumberOfPlayer.cs" />
-    <Compile Include="eRightOrLeft.cs" />
     <Compile Include="eSizeBoard.cs" />
     <Compile Include="eSoldierType.cs" />
     <Compile Include="eTypeOfPlayer.cs" />
-    <Compile Include="eUpOrDown.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
