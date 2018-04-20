@@ -59,11 +59,11 @@ namespace Program
             {
                 isValidInput = false;
             }
-            else if (!validRange(i_SizeOfBoard,CheckerBoard.k_StartCol, arrayofChars[0], arrayofChars[3]))
+            else if (!validRange(i_SizeOfBoard, MovementOptions.k_StartCol, arrayofChars[0], arrayofChars[3]))
             {
                 isValidInput = false;
             }
-            else if (!validRange(i_SizeOfBoard,CheckerBoard.k_StartRow, arrayofChars[1], arrayofChars[4]))
+            else if (!validRange(i_SizeOfBoard, MovementOptions.k_StartRow, arrayofChars[1], arrayofChars[4]))
             {
                 isValidInput = false;
             }

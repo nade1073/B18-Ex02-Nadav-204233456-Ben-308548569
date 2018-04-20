@@ -53,6 +53,7 @@
     <Compile Include="eSizeBoard.cs" />
     <Compile Include="eSoldierType.cs" />
     <Compile Include="eTypeOfPlayer.cs" />
+    <Compile Include="MovementOptions.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

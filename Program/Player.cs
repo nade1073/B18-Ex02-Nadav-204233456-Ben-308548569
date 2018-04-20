@@ -110,7 +110,7 @@ namespace Program
             {
                 case eNumberOfPlayer.First:
                     {
-                        startRowForNumberOfPlayer = CheckerBoard.k_StartRow;
+                        startRowForNumberOfPlayer = MovementOptions.k_StartRow;
                         representSoldier = Soldier.k_FirstPlayerRegular;
                         generateSolidersForPlayer(numberOfRows, numberOfPlayersInRow, startRowForNumberOfPlayer, representSoldier);
                         break;
@@ -118,7 +118,7 @@ namespace Program
                 case eNumberOfPlayer.Second:
                     {
                         representSoldier = Soldier.k_SecondPlayerRegular;
-                        startRowForNumberOfPlayer = (char)(CheckerBoard.k_StartRow +((int)(i_BoardSize)/2)+1);
+                        startRowForNumberOfPlayer = (char)(MovementOptions.k_StartRow + ((int)(i_BoardSize)/2)+1);
                         generateSolidersForPlayer(numberOfRows, numberOfPlayersInRow, startRowForNumberOfPlayer, representSoldier);
                         break;
                     }
@@ -131,11 +131,11 @@ namespace Program
             {
                 if ((int)i_startRow%2==1)
                 {
-                    startCol =(char)(CheckerBoard.k_StartCol +1);
+                    startCol =(char)(MovementOptions.k_StartCol + 1);
                 }
                 else
                 {
-                    startCol = CheckerBoard.k_StartCol;
+                    startCol = MovementOptions.k_StartCol;
                 }
                 for (int j=0;j< i_NumberOfPlayersInRow; j++)
                 {

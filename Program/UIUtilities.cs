@@ -146,7 +146,7 @@ namespace Program
             StringBuilder headLine = buildHeadLine(i_Size);
             StringBuilder equalsLine = builderEqualsLine(i_Size);
             board.AppendLine(headLine.ToString()).AppendLine(equalsLine.ToString());
-            char startRow = CheckerBoard.k_StartRow;
+            char startRow = MovementOptions.k_StartRow;
             for (int i=0;i< i_Size; i++)
             {
                 String rawForBoard = generateRawForBoard(i_FirstPlayer, i_SecondPlayer, startRow,i_Size, rawFormat);
@@ -179,7 +179,7 @@ namespace Program
         }
        private static StringBuilder buildHeadLine(int i_Size)
        {
-            char startLetter = CheckerBoard.k_StartCol;
+            char startLetter = MovementOptions.k_StartCol;
             StringBuilder raw = new StringBuilder();
             raw.Append("  ");
             for(int i=0;i<i_Size;i++)
@@ -203,7 +203,7 @@ namespace Program
        {
             List<String> paramsForRaw = new List<String>();
             List<Soldier> soldiersForEachRaw = new List<Soldier>();
-            char indexCol = CheckerBoard.k_StartCol;
+            char indexCol = MovementOptions.k_StartCol;
             int indexForList=0;
             soldiersForEachRaw.AddRange(i_FirstPlayer.getSoldierFromRaw(i_Raw));
             soldiersForEachRaw.AddRange(i_SecondPlayer.getSoldierFromRaw(i_Raw));
