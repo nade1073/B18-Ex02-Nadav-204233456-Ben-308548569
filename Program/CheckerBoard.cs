@@ -5,7 +5,7 @@
 
     public class CheckerBoard
     {
-        private readonly eSizeBoard m_SizeOfBoard;
+        private readonly eSizeBoard r_SizeOfBoard;
         private Player m_CurrentPlayer;
         private Player m_OtherPlayer;
         private eGameEndChoice m_GameEndChoice;
@@ -17,7 +17,7 @@
         {
             m_CurrentPlayer = i_FirstPlayer;
             m_OtherPlayer = i_SecondPlayer;
-            m_SizeOfBoard = i_SizeOfBoard;
+            r_SizeOfBoard = i_SizeOfBoard;
             m_GameEndChoice = eGameEndChoice.Continue;
             m_GameStatus = eGameStatus.ContinueGame;
             m_MovmentOption = new MovementOptions(i_SizeOfBoard);    
@@ -30,13 +30,13 @@
                 while (m_GameStatus == eGameStatus.ContinueGame)
                 {
                     Ex02.ConsoleUtils.Screen.Clear();
-                    UIUtilities.PrintBoard(m_CurrentPlayer, m_OtherPlayer, (int)m_SizeOfBoard);
+                    UIUtilities.PrintBoard(m_CurrentPlayer, m_OtherPlayer, (int)r_SizeOfBoard);
                     nextTurn();
                     setParamatersForNextTurn();
                 }
 
                 caclculateResultGame();
-                UIUtilities.printResultOnScreen(m_CurrentPlayer, m_OtherPlayer, (int)m_SizeOfBoard);
+                UIUtilities.printResultOnScreen(m_CurrentPlayer, m_OtherPlayer, (int)r_SizeOfBoard);
                 m_GameEndChoice = UIUtilities.getChoiseToContinuteTheGameFromClient();
                 if (m_GameEndChoice == eGameEndChoice.Continue)
                 {
@@ -60,6 +60,11 @@
                 case eGameStatus.SecondPlayerWon:
                     {
                         calculateAndSetPoints(secondPlayer, firstPlayer);
+                        break;
+                    }
+                case eGameStatus.QExit:
+                    {
+                        m_CurrentPlayer.Score += 4;
                         break;
                     }
             }
@@ -101,7 +106,7 @@
             SquareMove playerChoise;
             if (m_CurrentPlayer.TypeOfPlayer == eTypeOfPlayer.Human)
             {
-                playerChoise = generateSquareToMoveHuman(m_CurrentPlayer, m_SizeOfBoard, i_AvailableVaildMoves, i_MustToDoMoves);
+                playerChoise = generateSquareToMoveHuman(m_CurrentPlayer, r_SizeOfBoard, i_AvailableVaildMoves, i_MustToDoMoves);
             }
             else
             {
@@ -473,8 +478,8 @@
         {
             Player firstPlayer = getPlayer(eNumberOfPlayer.First);
             Player secondPlayer = getPlayer(eNumberOfPlayer.Second);
-            firstPlayer.generateSoliders(eNumberOfPlayer.First, m_SizeOfBoard);
-            secondPlayer.generateSoliders(eNumberOfPlayer.Second, m_SizeOfBoard);
+            firstPlayer.generateSoliders(eNumberOfPlayer.First, r_SizeOfBoard);
+            secondPlayer.generateSoliders(eNumberOfPlayer.Second, r_SizeOfBoard);
             m_CurrentPlayer = firstPlayer;
             m_OtherPlayer = secondPlayer;
             m_GameStatus = eGameStatus.ContinueGame;
