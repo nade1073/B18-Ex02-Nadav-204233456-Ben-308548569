@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AIMovementScore.cs" />
     <Compile Include="CheckerBoard.cs">
       <ExcludeFromStyleCop>False</ExcludeFromStyleCop>
     </Compile>

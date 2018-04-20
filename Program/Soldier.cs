@@ -20,6 +20,13 @@
             CharRepresent = i_CharRepresent;
         }
 
+        public Soldier(Soldier i_CurrentSolider)
+        {
+            m_CharRepresent = i_CurrentSolider.m_CharRepresent;
+            m_PlaceOnBoard = i_CurrentSolider.m_PlaceOnBoard;
+            m_TypeOfSoldier = i_CurrentSolider.m_TypeOfSoldier;
+        }
+
         public char CharRepresent
         {
             get

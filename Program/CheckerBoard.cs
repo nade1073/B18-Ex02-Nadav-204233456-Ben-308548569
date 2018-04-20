@@ -23,6 +23,28 @@
             m_MovmentOption = new MovementOptions(i_SizeOfBoard);    
         }
 
+        public CheckerBoard(CheckerBoard other)
+        {
+            Player otherFirstPlayer = other.m_CurrentPlayer;
+            Player otherSecondPlayer = other.m_OtherPlayer;
+            m_CurrentPlayer = new Player(otherFirstPlayer.PlayerName, otherFirstPlayer.TypeOfPlayer, otherFirstPlayer.NumberOfPlayer, other.r_SizeOfBoard);
+            m_OtherPlayer = new Player(otherSecondPlayer.PlayerName, otherSecondPlayer.TypeOfPlayer, otherSecondPlayer.NumberOfPlayer, other.r_SizeOfBoard);
+            r_SizeOfBoard = other.r_SizeOfBoard;
+            m_GameEndChoice = other.m_GameEndChoice;
+            m_GameStatus = other.m_GameStatus;
+            m_SoliderThatNeedToEatNextTurn = null;
+            m_MovmentOption = other.m_MovmentOption;
+            m_CurrentPlayer.Soldiers = new List<Soldier>();
+            m_OtherPlayer.Soldiers = new List<Soldier>();
+            foreach(Soldier currentSolider in other.m_CurrentPlayer.Soldiers)
+            {
+                m_CurrentPlayer.Soldiers.Add(new Soldier(currentSolider.CharRepresent, currentSolider.PlaceOnBoard, currentSolider.TypeOfSoldier));
+            }
+            foreach (Soldier currentSolider in other.m_OtherPlayer.Soldiers)
+            {
+                m_OtherPlayer.Soldiers.Add(new Soldier(currentSolider.CharRepresent, currentSolider.PlaceOnBoard, currentSolider.TypeOfSoldier));
+            }
+        }
         public void startGame()
         {
             while (m_GameEndChoice == eGameEndChoice.Continue)
@@ -118,21 +140,41 @@
 
         private SquareMove generateSquareToMoveComputer(List<SquareMove> i_AvaiableVaildMoves, List<SquareMove> i_MustToDoMoves)
         {
+            IAChecker chckerIAObject = new IAChecker(this);
+            List<AIMovementScore> avalibaleMovmenetsToCalculate = new List<AIMovementScore>();
             SquareMove randomSquareMove;
+            //CheckerImplement
+            SquareMove moveCheckerAI;
+
             Random rnd = new Random();
             int randomIndex;
             if (i_MustToDoMoves.Count > 0)
             {
+                //ChckerImplement
+                foreach(SquareMove currentMove in i_MustToDoMoves)
+                {
+                    avalibaleMovmenetsToCalculate.Add(new AIMovementScore(currentMove));
+                }
+                //
                 randomIndex = rnd.Next(i_MustToDoMoves.Count);
                 randomSquareMove = i_MustToDoMoves[randomIndex];
             }
             else
             {
+                //ChckerImplement
+                foreach (SquareMove currentMove in i_AvaiableVaildMoves)
+                {
+                    avalibaleMovmenetsToCalculate.Add(new AIMovementScore(currentMove));
+                }
+                //
                 randomIndex = rnd.Next(i_AvaiableVaildMoves.Count);
                 randomSquareMove = i_AvaiableVaildMoves[randomIndex];
             }
+            //Checker Implement
+            moveCheckerAI=chckerIAObject.IACheckerCalculateNextMove(avalibaleMovmenetsToCalculate);
 
-            return randomSquareMove;
+            return moveCheckerAI;
+           // return randomSquareMove;
         }
 
         private SquareMove generateSquareToMoveHuman(Player i_CurrentPlayer, eSizeBoard i_SizeOfBoard, List<SquareMove> i_AvaiableVaildMoves, List<SquareMove> i_MustToDoMoves)
@@ -172,7 +214,7 @@
                 addMustDoMoves(i_AvaiableVaildMoves, ref io_MustToDoMoves);
             }
         }
-
+         
         private void addMustDoMoves(List<SquareMove> i_AvaiableVaildMoves, ref List<SquareMove> io_MustToDoMoves)
         {
             foreach (SquareMove currentMove in i_AvaiableVaildMoves)
@@ -345,7 +387,33 @@
             m_CurrentPlayer = m_OtherPlayer;
             m_OtherPlayer = tempPlayer;
         }
+        
+        private void performSoliderActionForIA(SquareMove i_PlayerChoise)
+        {
+            List<Soldier> unifiedSoliderList = new List<Soldier>();
+            unifiedSoliderList.AddRange(m_CurrentPlayer.Soldiers);
+            unifiedSoliderList.AddRange(m_OtherPlayer.Soldiers);
+            foreach (Soldier tempSolider in unifiedSoliderList)
+            {
+                if (tempSolider.PlaceOnBoard.Equals(i_PlayerChoise.FromSquare))
+                {
+                    tempSolider.PlaceOnBoard = i_PlayerChoise.ToSquare;
+                    checkAndSetKingSolider(tempSolider);
+                    m_SoliderThatNeedToEatNextTurn = null;
+                    break;
+                }
+                if (Math.Abs(i_PlayerChoise.ToSquare.Col - i_PlayerChoise.FromSquare.Col) == 2)
+                {
+                    removeOtherPlayerSoliderFromBoard(i_PlayerChoise);
+                    setParamatersIfIsSoliderNeedToEatNextTurn(i_PlayerChoise.ToSquare);
+                }
 
+                if (m_OtherPlayer.Soldiers.Count == 0)
+                {
+                    setGameStatus(m_CurrentPlayer);
+                }
+            }
+        }
         private void perfomSoliderAction(SquareMove i_PlayerChoise)
         {
             foreach (Soldier currentSoldier in m_CurrentPlayer.Soldiers)
@@ -483,9 +551,101 @@
             m_CurrentPlayer = firstPlayer;
             m_OtherPlayer = secondPlayer;
             m_GameStatus = eGameStatus.ContinueGame;
-         
             m_SoliderThatNeedToEatNextTurn = null;
             UIUtilities.initializeParameters();
         }
+
+        private class IAChecker
+        {
+            CheckerBoard m_TempCheckerBoard;
+            public IAChecker(CheckerBoard i_ChcekerBoard)
+            {
+                m_TempCheckerBoard = new CheckerBoard(i_ChcekerBoard);
+            }
+
+            public SquareMove IACheckerCalculateNextMove(List<AIMovementScore> i_ListOfAllMovements)
+            {
+               
+                foreach (AIMovementScore currentMove in i_ListOfAllMovements)
+                {
+                    int scoreResult = generateScore(currentMove);
+                    currentMove.Score = scoreResult;
+                }
+                int max=i_ListOfAllMovements[0].Score;
+                SquareMove squareResultToMove = i_ListOfAllMovements[0].SquareMove;
+                foreach (AIMovementScore currentMove in i_ListOfAllMovements)
+                {
+                    if(currentMove.Score>max)
+                    {
+                        max = currentMove.Score;
+                        squareResultToMove = currentMove.SquareMove;
+                    }
+                }
+                return squareResultToMove;
+            }
+
+            private int generateScore(AIMovementScore i_Movment)
+            {
+                int a = -Int32.MaxValue;
+                int b = Int32.MaxValue;
+                int score = miniMaxAlgorithem(m_TempCheckerBoard,i_Movment.FromSquare, i_Movment.ToSquare,a,b,3, false);
+                return score;
+            }
+
+            private int miniMaxAlgorithem(CheckerBoard i_CheckerBoard, Square i_FromSquare, Square i_ToSquare,int a,int b, int i_Depth, bool minimax)
+            {
+                if (i_Depth == 0)
+                {
+                    return i_CheckerBoard.m_CurrentPlayer.calculatePointsOfSoliders() - i_CheckerBoard.m_OtherPlayer.calculatePointsOfSoliders();
+                }
+                else
+                {
+                    List<SquareMove> validMoves = new List<SquareMove>();
+                    if(i_ToSquare!=null)
+                    {
+                        validMoves.Add(new SquareMove(i_FromSquare, i_ToSquare));
+                    }
+                    else
+                    {
+                        foreach (Soldier currentSoldier in i_CheckerBoard.m_CurrentPlayer.Soldiers)
+                        {
+                                validMoves.AddRange(i_CheckerBoard.getValidMoveOfSolider(currentSoldier));
+                        }
+                    }
+                    if (validMoves.Count==0)
+                    {
+                        return i_CheckerBoard.m_CurrentPlayer.calculatePointsOfSoliders() - i_CheckerBoard.m_OtherPlayer.calculatePointsOfSoliders();
+                    }
+                    foreach(SquareMove currentMove in validMoves)
+                    {
+                        CheckerBoard o_NewCheckerBoard;
+                        performMove(i_CheckerBoard, out o_NewCheckerBoard, currentMove);
+                        if(minimax==true)
+                        {
+                            a = Math.Max(a, miniMaxAlgorithem(o_NewCheckerBoard,null, null, a, b, i_Depth - 1, false));
+                            if (b <= a)
+                                return b;
+                        }
+                        else
+                        {
+                            b = Math.Min(b, miniMaxAlgorithem(o_NewCheckerBoard,null, null, a, b, i_Depth - 1, true));
+                            if (b <= a)
+                                return a;
+                        }
+                    }
+                    return minimax ? a : b;
+                }
+            }
+            private void performMove(CheckerBoard i_Original,out CheckerBoard i_CopyOfCheckerBoard,SquareMove i_SquareToMoveInNewBoard)
+            {
+                i_CopyOfCheckerBoard = new CheckerBoard(i_Original);
+                i_CopyOfCheckerBoard.performSoliderActionForIA(i_SquareToMoveInNewBoard);
+                Player tempPlayer = i_CopyOfCheckerBoard.m_CurrentPlayer;
+                i_CopyOfCheckerBoard.m_CurrentPlayer = i_CopyOfCheckerBoard.m_OtherPlayer;
+                i_CopyOfCheckerBoard.m_OtherPlayer = tempPlayer;
+
+            }
+        }
+
     }
 }
