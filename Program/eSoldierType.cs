@@ -3,6 +3,6 @@
     public enum eSoldierType
     {
       Regular,
-      King
+      King
     }
 }

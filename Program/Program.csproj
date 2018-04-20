@@ -46,7 +46,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CheckerBoard.cs" />
+    <Compile Include="CheckerBoard.cs">
+      <ExcludeFromStyleCop>False</ExcludeFromStyleCop>
+    </Compile>
     <Compile Include="eGameEndChoice.cs" />
     <Compile Include="eGameStatus.cs" />
     <Compile Include="eNumberOfPlayer.cs" />

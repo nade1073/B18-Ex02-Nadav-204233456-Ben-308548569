@@ -1,5 +1,4 @@
-﻿
-namespace Program
+﻿namespace Program
 {
     public enum eGameStatus
     {

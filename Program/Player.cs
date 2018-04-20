@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Program
+﻿namespace Program
 {
+    using System;
+    using System.Collections.Generic;
+
     public class Player
     {
         private int m_Score;
@@ -11,7 +11,16 @@ namespace Program
         private eTypeOfPlayer m_TypeOfPlayer;
         private eNumberOfPlayer m_NumberOfPlayer;
 
-        //Getters and Setters
+        public Player(String i_PlayerName, eTypeOfPlayer i_TypeOfPlayer, eNumberOfPlayer i_NumberOfPlayer, eSizeBoard i_BoardSize)
+        {
+            Score = 0;
+            PlayerName = i_PlayerName;
+            TypeOfPlayer = i_TypeOfPlayer;
+            NumberOfPlayer = i_NumberOfPlayer;
+            Soldiers = new List<Soldier>();
+            generateSoliders(i_NumberOfPlayer, i_BoardSize);
+        }
+
         public int Score
         {
             get
@@ -24,6 +33,7 @@ namespace Program
                 m_Score = value;
             }
         }
+
         public string PlayerName
         {
             get
@@ -36,6 +46,7 @@ namespace Program
                 m_PlayerName = value;
             }
         }
+
         public List<Soldier> Soldiers
         {
             get
@@ -48,6 +59,7 @@ namespace Program
                 m_Soldiers = value;
             }
         }
+
         public eNumberOfPlayer NumberOfPlayer
         {
             get
@@ -60,6 +72,7 @@ namespace Program
                 m_NumberOfPlayer = value;
             }
         }
+
         public eTypeOfPlayer TypeOfPlayer
         {
             get
@@ -73,40 +86,31 @@ namespace Program
             }
         }
 
-        //Constructor
-        public Player(String i_PlayerName,eTypeOfPlayer i_TypeOfPlayer,eNumberOfPlayer i_NumberOfPlayer,eSizeBoard i_BoardSize)
-        {
-            Score = 0;
-            PlayerName = i_PlayerName;
-            TypeOfPlayer = i_TypeOfPlayer;
-            NumberOfPlayer = i_NumberOfPlayer;
-            Soldiers = new List<Soldier>();
-            generateSoliders(i_NumberOfPlayer, i_BoardSize);
-        }
-
-        //Functions
         public static bool isPlayerNameValid(String i_PlayerName)
         {        
             bool isProperName = true;
-            if(i_PlayerName.Length >20)
+            if (i_PlayerName.Length > 20)
             {
                 isProperName = false;
             }
-            if(i_PlayerName.Contains(" "))
+
+            if (i_PlayerName.Contains(" "))
             {
                 isProperName = false;
             }
+
             return isProperName;
         }
-        public void generateSoliders(eNumberOfPlayer i_NumberOfPlayer,eSizeBoard i_BoardSize)
+
+        public void generateSoliders(eNumberOfPlayer i_NumberOfPlayer, eSizeBoard i_BoardSize)
         {
             Soldiers.Clear();
-            int numberOfRows = ((int)i_BoardSize/2)-1;
-            int numberOfPlayersInRow = ((int)i_BoardSize / 2);
+            int numberOfRows = ((int)i_BoardSize / 2) - 1;
+            int numberOfPlayersInRow = (int)i_BoardSize / 2;
             char startRowForNumberOfPlayer;
             char representSoldier;
 
-            switch(i_NumberOfPlayer)
+            switch (i_NumberOfPlayer)
             {
                 case eNumberOfPlayer.First:
                     {
@@ -115,63 +119,47 @@ namespace Program
                         generateSolidersForPlayer(numberOfRows, numberOfPlayersInRow, startRowForNumberOfPlayer, representSoldier);
                         break;
                     }
+
                 case eNumberOfPlayer.Second:
                     {
                         representSoldier = Soldier.k_SecondPlayerRegular;
-                        startRowForNumberOfPlayer = (char)(MovementOptions.k_StartRow + ((int)(i_BoardSize)/2)+1);
+                        startRowForNumberOfPlayer = (char)(MovementOptions.k_StartRow + ((int)i_BoardSize / 2) + 1);
                         generateSolidersForPlayer(numberOfRows, numberOfPlayersInRow, startRowForNumberOfPlayer, representSoldier);
                         break;
                     }
             }
         }
-        private void generateSolidersForPlayer(int i_NumberOfRows,int i_NumberOfPlayersInRow,char i_startRow,char i_RepresentSoldier)
-        {
-            char startCol;
-            for (int i=0;i< i_NumberOfRows; i++)
-            {
-                if ((int)i_startRow%2==1)
-                {
-                    startCol =(char)(MovementOptions.k_StartCol + 1);
-                }
-                else
-                {
-                    startCol = MovementOptions.k_StartCol;
-                }
-                for (int j=0;j< i_NumberOfPlayersInRow; j++)
-                {
-                    Soldiers.Add(new Soldier(i_RepresentSoldier, new Square(i_startRow, startCol)));
-                    startCol = (char)(startCol + 2);
-                }
-                i_startRow++;
-            }
-        }
+      
         public List<Soldier> getSoldierFromRaw(char i_Raw)
         {
             List<Soldier> soldiersFromSameRaw = new List<Soldier>();
-            foreach(Soldier tempSoldier in Soldiers)
+            foreach (Soldier tempSoldier in Soldiers)
             {
-                if(tempSoldier.PlaceOnBoard.Row==i_Raw)
+                if (tempSoldier.PlaceOnBoard.Row == i_Raw)
                 {
                     soldiersFromSameRaw.Add(tempSoldier);
                 }
             }
+
             return soldiersFromSameRaw;
         }
+
         public void RemoveSolider(Square i_SoliderToRemove)
         {
-            foreach(Soldier currentSolider in Soldiers)
+            foreach (Soldier currentSolider in Soldiers)
             {
-                if(currentSolider.PlaceOnBoard.Equals(i_SoliderToRemove))
+                if (currentSolider.PlaceOnBoard.Equals(i_SoliderToRemove))
                 {
                     Soldiers.Remove(currentSolider);
                     break;
                 }
             }
         }
+
         public int calculatePointsOfSoliders()
         {
             int result = 0;
-            foreach(Soldier currentSolider in Soldiers)
+            foreach (Soldier currentSolider in Soldiers)
             {
                 if (currentSolider.TypeOfSoldier == eSoldierType.King)
                 {
@@ -182,8 +170,32 @@ namespace Program
                     result += 1;
                 }
             }
+
             return result;
         }
-      
+
+        private void generateSolidersForPlayer(int i_NumberOfRows, int i_NumberOfPlayersInRow, char i_startRow, char i_RepresentSoldier)
+        {
+            char startCol;
+            for (int i = 0; i < i_NumberOfRows; i++)
+            {
+                if ((int)i_startRow % 2 == 1)
+                {
+                    startCol = (char)(MovementOptions.k_StartCol + 1);
+                }
+                else
+                {
+                    startCol = MovementOptions.k_StartCol;
+                }
+
+                for (int j = 0; j < i_NumberOfPlayersInRow; j++)
+                {
+                    Soldiers.Add(new Soldier(i_RepresentSoldier, new Square(i_startRow, startCol)));
+                    startCol = (char)(startCol + 2);
+                }
+
+                i_startRow++;
+            }
+        }
     }
 }
