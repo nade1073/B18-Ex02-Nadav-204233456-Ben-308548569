@@ -60,6 +60,19 @@
             }
         }
 
+        public int getNumberOfSpesificSoldierType(eSoldierType i_Type)
+        {
+            int count = 0;
+            foreach (Soldier currentSoldier in m_Soldiers)
+            {
+                if (currentSoldier.TypeOfSoldier == i_Type)
+                {
+                    count++;
+                }
+            }
+            return count;
+        }
+
         public eNumberOfPlayer NumberOfPlayer
         {
             get

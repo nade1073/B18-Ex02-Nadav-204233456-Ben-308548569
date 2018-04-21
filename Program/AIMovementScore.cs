@@ -3,7 +3,8 @@
     class AIMovementScore
     {
         private SquareMove m_FromToSquare;
-        private int m_Score=0;
+        private double m_ScoreOfMove=0;
+        private int m_ScoreInBoard=0;
 
         public AIMovementScore(SquareMove i_Square)
         {
@@ -23,15 +24,15 @@
                return m_FromToSquare.ToSquare;
             }
         }
-        public int Score
+        public double ScoreOfMove
         {
             get
             {
-                return m_Score;
+                return m_ScoreOfMove;
             }
             set
             {
-                m_Score = value;
+                m_ScoreOfMove = value;
             }
         }
         public SquareMove SquareMove
@@ -41,6 +42,18 @@
                 return m_FromToSquare;
             }
         }
+        public int ScoreInBoard
+        {
+            get
+            {
+                return m_ScoreInBoard;
+            }
+            set
+            {
+                m_ScoreInBoard = value;
+            }
+        }
+        
 
     }
 }

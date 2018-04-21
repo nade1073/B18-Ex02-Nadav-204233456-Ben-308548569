@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AIMovementScore.cs" />
+    <Compile Include="BoardSquareScore.cs" />
     <Compile Include="CheckerBoard.cs">
       <ExcludeFromStyleCop>False</ExcludeFromStyleCop>
     </Compile>
