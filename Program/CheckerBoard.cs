@@ -36,7 +36,12 @@
             m_MovmentOption = i_CloneToThisBoard.m_MovmentOption;
             m_CurrentPlayer.Soldiers = new List<Soldier>();
             m_OtherPlayer.Soldiers = new List<Soldier>();
-            foreach(Soldier currentSolider in i_CloneToThisBoard.m_CurrentPlayer.Soldiers)
+            if (i_CloneToThisBoard.m_SoliderThatNeedToEatNextTurn != null)
+            {
+                m_SoliderThatNeedToEatNextTurn = new Soldier(i_CloneToThisBoard.m_SoliderThatNeedToEatNextTurn.CharRepresent, i_CloneToThisBoard.m_SoliderThatNeedToEatNextTurn.PlaceOnBoard, i_CloneToThisBoard.m_SoliderThatNeedToEatNextTurn.TypeOfSoldier);
+            }
+            
+            foreach (Soldier currentSolider in i_CloneToThisBoard.m_CurrentPlayer.Soldiers)
             {
                 m_CurrentPlayer.Soldiers.Add(new Soldier(currentSolider.CharRepresent, currentSolider.PlaceOnBoard, currentSolider.TypeOfSoldier));
             }
@@ -327,7 +332,7 @@
             List<SquareMove> tempVaildMoves = new List<SquareMove>();
             SquareMove tempMoveRight;
             SquareMove tempMoveLeft;
-            if ((i_RowMoveUpOrDown == m_MovmentOption.MoveDown && i_CurrentSolider.PlaceOnBoard.Row < m_MovmentOption.EndRow) || (i_RowMoveUpOrDown == m_MovmentOption.MoveUp && i_CurrentSolider.PlaceOnBoard.Row > MovementOptions.k_StartCol))
+            if ((i_RowMoveUpOrDown == m_MovmentOption.MoveDown && i_CurrentSolider.PlaceOnBoard.Row < m_MovmentOption.EndRow) || (i_RowMoveUpOrDown == m_MovmentOption.MoveUp && i_CurrentSolider.PlaceOnBoard.Row > MovementOptions.k_StartRow))
             {
                 if (i_CurrentSolider.PlaceOnBoard.Col < m_MovmentOption.EndCol)
                 {
@@ -372,17 +377,14 @@
             m_OtherPlayer = tempPlayer;
         }
        
-        private void perfomSoliderAction(SquareMove i_PlayerChoise,bool i_UseUiTitlities=true)
+        private void perfomSoliderAction(SquareMove i_PlayerChoise)
         {
             foreach (Soldier currentSoldier in m_CurrentPlayer.Soldiers)
             {
                 if (currentSoldier.PlaceOnBoard.Equals(i_PlayerChoise.FromSquare))
                 {
                     currentSoldier.PlaceOnBoard = i_PlayerChoise.ToSquare;
-                    if (i_UseUiTitlities)
-                    {
-                        UIUtilities.setCurrentMove(m_CurrentPlayer.PlayerName, currentSoldier.CharRepresent, i_PlayerChoise);
-                    }
+                    UIUtilities.setCurrentMove(m_CurrentPlayer.PlayerName, currentSoldier.CharRepresent, i_PlayerChoise);
                     checkAndSetKingSolider(currentSoldier);
                     m_SoliderThatNeedToEatNextTurn = null;
                     break;
@@ -540,7 +542,7 @@
                     
                     performMoveAndSwitchPlayers(m_TempCloneBoard, out tempBoard, currentMove.SquareMove);
                     currentMove.ScoreOfMove = miniMaxAlgorithem(tempBoard, IAChecker.k_IADepth, !maxmizingPlayer, alpha,beta);
-                    currentMove.ScoreInBoard = m_ScoresOfBoard.ArrayOfScores[currentMove.ToSquare.Col-'A', currentMove.ToSquare.Row-'a'];
+                    currentMove.ScoreInBoard = m_ScoresOfBoard.ArrayOfScores[currentMove.ToSquare.Row - 'a',currentMove.ToSquare.Col-'A'];
                 }
                 double maxHeuristics = Double.NegativeInfinity;
                 foreach (AIMovementScore currentMove in i_ListOfAllMovements)
@@ -569,9 +571,18 @@
             }
             private double getHeuristic(CheckerBoard i_Board)
             {
-                double kingWeight = 1.2;
+                double kingWeight = 1.3;
                 double result = 0;
-                result = i_Board.m_CurrentPlayer.getNumberOfSpesificSoldierType(eSoldierType.King) * kingWeight + i_Board.m_CurrentPlayer.getNumberOfSpesificSoldierType(eSoldierType.Regular) - i_Board.m_OtherPlayer.getNumberOfSpesificSoldierType(eSoldierType.King) * kingWeight - i_Board.m_OtherPlayer.getNumberOfSpesificSoldierType(eSoldierType.Regular);
+
+                if(i_Board.m_CurrentPlayer.TypeOfPlayer==eTypeOfPlayer.Computer)
+                {
+                    result = i_Board.m_CurrentPlayer.getNumberOfSpesificSoldierType(eSoldierType.King) * kingWeight + i_Board.m_CurrentPlayer.getNumberOfSpesificSoldierType(eSoldierType.Regular) - i_Board.m_OtherPlayer.getNumberOfSpesificSoldierType(eSoldierType.King) * kingWeight - i_Board.m_OtherPlayer.getNumberOfSpesificSoldierType(eSoldierType.Regular);
+                }
+                else
+                {
+                    result = i_Board.m_OtherPlayer.getNumberOfSpesificSoldierType(eSoldierType.King) * kingWeight + i_Board.m_OtherPlayer.getNumberOfSpesificSoldierType(eSoldierType.Regular) - i_Board.m_CurrentPlayer.getNumberOfSpesificSoldierType(eSoldierType.King) * kingWeight - i_Board.m_CurrentPlayer.getNumberOfSpesificSoldierType(eSoldierType.Regular);
+                }
+               
                 return result;
 
             }
@@ -581,8 +592,15 @@
                 {
                     return getHeuristic(i_Board);
                 }
-                List<SquareMove> availableVaildMoves = i_Board.generateValidMovesOfPlayer(i_Board.m_CurrentPlayer);
-
+                List<SquareMove> availableVaildMoves;
+                if (i_Board.m_SoliderThatNeedToEatNextTurn == null)
+                {
+                   availableVaildMoves = i_Board.generateValidMovesOfPlayer(i_Board.m_CurrentPlayer);
+                }
+                else
+                {
+                    availableVaildMoves = i_Board.getValidMoveOfSolider(i_Board.m_SoliderThatNeedToEatNextTurn);
+                }
                 double initial=0;
                 CheckerBoard tempBoard = null;
 
@@ -591,8 +609,16 @@
                     initial = Double.NegativeInfinity;
                     foreach (SquareMove currentMove in availableVaildMoves)
                     {
+                        double result = 0;
                         performMoveAndSwitchPlayers(i_Board, out tempBoard, currentMove);
-                        double result = miniMaxAlgorithem(tempBoard, i_Depth - 1, !i_MaxmizingPlayer, i_Alpha, i_Beta);
+                        if (tempBoard.m_SoliderThatNeedToEatNextTurn != null)
+                        {
+                            result = miniMaxAlgorithem(tempBoard, i_Depth - 1, i_MaxmizingPlayer, i_Alpha, i_Beta);
+                        }
+                        else
+                        {
+                            result = miniMaxAlgorithem(tempBoard, i_Depth - 1, !i_MaxmizingPlayer, i_Alpha, i_Beta);
+                        }
                         initial = Math.Max(result, initial);
                         i_Alpha = Math.Max(i_Alpha, initial);
                         if (i_Alpha >= i_Beta)
@@ -606,10 +632,18 @@
                     initial = Double.PositiveInfinity;
                     foreach (SquareMove currentMove in availableVaildMoves)
                     {
+                        double result = 0;
                         performMoveAndSwitchPlayers(i_Board, out tempBoard, currentMove);
-                        double result = miniMaxAlgorithem(tempBoard, i_Depth - 1, !i_MaxmizingPlayer, i_Alpha, i_Beta);
+                        if (tempBoard.m_SoliderThatNeedToEatNextTurn != null)
+                        {
+                            result = miniMaxAlgorithem(tempBoard, i_Depth - 1, i_MaxmizingPlayer, i_Alpha, i_Beta);
+                        }
+                        else
+                        {
+                            result = miniMaxAlgorithem(tempBoard, i_Depth - 1, !i_MaxmizingPlayer, i_Alpha, i_Beta);
+                        }
                         initial = Math.Min(result, initial);
-                        i_Beta = Math.Min(i_Alpha, initial);
+                        i_Beta = Math.Min(i_Beta, initial);
                         if (i_Alpha >= i_Beta)
                         {
                             break;
@@ -622,10 +656,13 @@
             private void performMoveAndSwitchPlayers(CheckerBoard i_Original,out CheckerBoard o_CopyOfCheckerBoard,SquareMove i_SquareToMoveInNewBoard)
             {
                 o_CopyOfCheckerBoard = new CheckerBoard(i_Original);
-                o_CopyOfCheckerBoard.perfomSoliderAction(i_SquareToMoveInNewBoard,false);
-                Player tempPlayer = o_CopyOfCheckerBoard.m_CurrentPlayer;
-                o_CopyOfCheckerBoard.m_CurrentPlayer = o_CopyOfCheckerBoard.m_OtherPlayer;
-                o_CopyOfCheckerBoard.m_OtherPlayer = tempPlayer;
+                o_CopyOfCheckerBoard.perfomSoliderAction(i_SquareToMoveInNewBoard);
+                if (o_CopyOfCheckerBoard.m_SoliderThatNeedToEatNextTurn == null)
+                {
+                    Player tempPlayer = o_CopyOfCheckerBoard.m_CurrentPlayer;
+                    o_CopyOfCheckerBoard.m_CurrentPlayer = o_CopyOfCheckerBoard.m_OtherPlayer;
+                    o_CopyOfCheckerBoard.m_OtherPlayer = tempPlayer;
+                }
             }
         }
 
