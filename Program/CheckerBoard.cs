@@ -522,14 +522,20 @@
 
         private class IAChecker
         {
-
             private CheckerBoard m_TempCloneBoard;
-            private BoardSquareScore m_ScoresOfBoard;
+            private BoardSquareScore m_ScoresOfBoard=null;
             public const int k_IADepth = 5;
-            public IAChecker(CheckerBoard i_ChcekerBoard)
+            public IAChecker(CheckerBoard i_CheckerBoard)
             {
-                m_TempCloneBoard = new CheckerBoard(i_ChcekerBoard);
-                m_ScoresOfBoard = new BoardSquareScore(i_ChcekerBoard.r_SizeOfBoard);
+                initializeClassMembers(i_CheckerBoard);
+            }
+            private void initializeClassMembers(CheckerBoard i_CheckerBoard)
+            {
+                m_TempCloneBoard = new CheckerBoard(i_CheckerBoard);
+                if (m_ScoresOfBoard == null)
+                {
+                    m_ScoresOfBoard = new BoardSquareScore(i_CheckerBoard.r_SizeOfBoard);
+                }
             }
             public SquareMove IACheckerCalculateNextMove(List<AIMovementScore> i_ListOfAllMovements)
             {

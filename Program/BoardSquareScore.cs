@@ -8,15 +8,16 @@ namespace Program
 {
     public class BoardSquareScore
     {
-        //Need to set readonly
-        private int[,] m_ArrayOfScore;
+    
+        private readonly int[,] m_ArrayOfScore;
         public BoardSquareScore(eSizeBoard i_SizeOfBoard)
         {
-            generateArray(i_SizeOfBoard);
+            m_ArrayOfScore=generateArray(i_SizeOfBoard);
         }
-        private void generateArray(eSizeBoard i_SizeOfBoard)
+        private int[,] generateArray(eSizeBoard i_SizeOfBoard)
         {
-            switch(i_SizeOfBoard)
+            int[,] returnedArr=null;   
+            switch (i_SizeOfBoard)
             {
                 case eSizeBoard.Six:
                     {
@@ -27,7 +28,7 @@ namespace Program
                                          {0,2,0,2,0,3},
                                          {3,0,3,0,3,0}   
                         };
-                        m_ArrayOfScore = array;
+                        returnedArr = array;
                         break;
                     }
                 case eSizeBoard.Eight:
@@ -41,7 +42,7 @@ namespace Program
                                          {0,3,0,3,0,3,0,4},
                                          {4,0,4,0,4,0,4,0}
                         };
-                        m_ArrayOfScore = array;
+                        returnedArr = array;
                         break;
                     }
                 case eSizeBoard.Ten:
@@ -58,14 +59,13 @@ namespace Program
                                          {5,0,5,0,5,0,5,0,5,0}
                                        
                         };
-                        m_ArrayOfScore = array;
+                        returnedArr = array;
                         break;
 
                     }
 
             }
-           
-
+            return returnedArr;
 
         }
 
