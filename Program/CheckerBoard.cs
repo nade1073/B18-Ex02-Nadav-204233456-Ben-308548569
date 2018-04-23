@@ -29,7 +29,6 @@
             m_SizeOfBoard = i_CloneToThisBoard.m_SizeOfBoard;
             m_GameEndChoice = i_CloneToThisBoard.m_GameEndChoice;
             m_GameStatus = i_CloneToThisBoard.m_GameStatus;
-            m_SoliderThatNeedToEatNextTurn = null;
             m_MovmentOption = i_CloneToThisBoard.m_MovmentOption;
             m_CurrentPlayer.Soldiers = new List<Soldier>();
             m_OtherPlayer.Soldiers = new List<Soldier>();

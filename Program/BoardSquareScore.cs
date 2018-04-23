@@ -16,55 +16,31 @@ namespace Program
         }
         private int[,] generateArray(eSizeBoard i_SizeOfBoard)
         {
-            int[,] returnedArr=null;   
-            switch (i_SizeOfBoard)
-            {
-                case eSizeBoard.Six:
-                    {
-                        int[,] array = { {0,3,0,3,0,3},
-                                         {3,0,2,0,2,0},
-                                         {0,2,0,1,0,3},
-                                         {3,0,1,0,2,0},
-                                         {0,2,0,2,0,3},
-                                         {3,0,3,0,3,0}   
-                        };
-                        returnedArr = array;
-                        break;
-                    }
-                case eSizeBoard.Eight:
-                    {
-                        int[,] array = { {0,4,0,4,0,4,0,4},
-                                         {4,0,3,0,3,0,3,0},
-                                         {0,3,0,2,0,2,0,4},
-                                         {4,0,2,0,1,0,3,0},
-                                         {0,3,0,1,0,2,0,4},
-                                         {4,0,2,0,2,0,3,0},
-                                         {0,3,0,3,0,3,0,4},
-                                         {4,0,4,0,4,0,4,0}
-                        };
-                        returnedArr = array;
-                        break;
-                    }
-                case eSizeBoard.Ten:
-                    {
-                        int[,] array = { {0,5,0,5,0,5,0,5,0,5},
-                                         {5,0,4,0,4,0,4,0,4,0},
-                                         {0,4,0,3,0,3,0,3,0,5},
-                                         {5,0,3,0,2,0,2,0,4,0},
-                                         {0,4,0,2,0,1,0,3,0,5},
-                                         {5,0,3,0,1,0,2,0,4,0},
-                                         {0,4,0,2,0,2,0,3,0,5},
-                                         {5,0,3,0,3,0,3,0,4,0},
-                                         {0,4,0,4,0,4,0,4,0,5},
-                                         {5,0,5,0,5,0,5,0,5,0}
-                                       
-                        };
-                        returnedArr = array;
-                        break;
+            int sizeOfBoardInteger = (int)i_SizeOfBoard;
+            int[,] returnedArr = new int[sizeOfBoardInteger, sizeOfBoardInteger];
 
-                    }
+            int maxScore = sizeOfBoardInteger / 2;
+
+            for (int i = 0; i < sizeOfBoardInteger / 2; i++)
+            {
+                for (int j = i; j < sizeOfBoardInteger; j += 2)
+                {
+                    returnedArr[i, j] = 0;
+                    returnedArr[i, j + 1] = maxScore;
+                    returnedArr[j, i] = 0;
+                    returnedArr[j + 1, i] = maxScore;
+                    returnedArr[sizeOfBoardInteger - 1, j] = maxScore;
+                    returnedArr[sizeOfBoardInteger - 1, j + 1] = 0;
+                    returnedArr[j, sizeOfBoardInteger - 1] = maxScore;
+                    returnedArr[j + 1, sizeOfBoardInteger - 1] = 0;
+
+
+                }
+                maxScore--;
+                sizeOfBoardInteger--;
 
             }
+
             return returnedArr;
 
         }
@@ -73,7 +49,7 @@ namespace Program
         {
             get
             {
-                return this.m_ArrayOfScore;
+                return m_ArrayOfScore;
             }
         }
         

@@ -5,7 +5,7 @@ namespace Program
 {
     internal class IAChecker
     {
-        private BoardSquareScore m_ScoresOfBoard;
+        private readonly BoardSquareScore m_ScoresOfBoard;
         public const int k_IADepth = 5;
         public IAChecker(eSizeBoard i_SizeOfBoard)
         {
@@ -21,7 +21,7 @@ namespace Program
             {
                 performMoveAndSwitchPlayers(i_CurrentCheckerBoard, out tempBoard, currentMove.SquareMove);
                 currentMove.ScoreOfMove = miniMaxAlgorithem(tempBoard, IAChecker.k_IADepth, !maxmizingPlayer, alpha, beta);
-                currentMove.ScoreInBoard = m_ScoresOfBoard.ArrayOfScores[currentMove.ToSquare.Row - MovementOptions.k_StartRow, currentMove.ToSquare.Col - MovementOptions.k_StartRow];
+                currentMove.ScoreInBoard = m_ScoresOfBoard.ArrayOfScores[currentMove.ToSquare.Row - MovementOptions.k_StartRow, currentMove.ToSquare.Col - MovementOptions.k_StartCol];
             }
             double maxHeuristics = Double.NegativeInfinity;
             foreach (AIMovementScore currentMove in i_ListOfAllMovements)
