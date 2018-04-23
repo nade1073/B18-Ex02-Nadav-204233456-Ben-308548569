@@ -5,22 +5,17 @@
 
     public class CheckerBoard
     {
-        private readonly eSizeBoard r_SizeOfBoard;
+        private eSizeBoard r_SizeOfBoard;
         private Player m_CurrentPlayer;
         private Player m_OtherPlayer;
-        private eGameEndChoice m_GameEndChoice;
-        private eGameStatus m_GameStatus;
+        private eGameEndChoice m_GameEndChoice=eGameEndChoice.Continue;
+        private eGameStatus m_GameStatus= eGameStatus.ContinueGame;
         private MovementOptions m_MovmentOption;
+
         private Soldier m_SoliderThatNeedToEatNextTurn;
 
-        public CheckerBoard(Player i_FirstPlayer, Player i_SecondPlayer, eSizeBoard i_SizeOfBoard)
+        public CheckerBoard()
         {
-            m_CurrentPlayer = i_FirstPlayer;
-            m_OtherPlayer = i_SecondPlayer;
-            r_SizeOfBoard = i_SizeOfBoard;
-            m_GameEndChoice = eGameEndChoice.Continue;
-            m_GameStatus = eGameStatus.ContinueGame;
-            m_MovmentOption = new MovementOptions(i_SizeOfBoard);    
         }
 
         public CheckerBoard(CheckerBoard i_CloneToThisBoard)
@@ -53,6 +48,7 @@
 
         public void startGame()
         {
+            initializeStartCheckerBoard();
             while (m_GameEndChoice == eGameEndChoice.Continue)
             {
                 while (m_GameStatus == eGameStatus.ContinueGame)
@@ -71,6 +67,24 @@
                     initializeCheckerGame();
                 }
             }
+        }
+
+        private void initializeStartCheckerBoard()
+        {
+            String firstPlayerName,secondPlayerName;
+            eSizeBoard sizeOfBoard;
+            UIUtilities.getClientNamesAndTypeOfSecondPlayer(out firstPlayerName, out secondPlayerName, out sizeOfBoard);
+            m_CurrentPlayer = new Player(firstPlayerName, eTypeOfPlayer.Human, eNumberOfPlayer.First, sizeOfBoard);
+            r_SizeOfBoard = sizeOfBoard;
+            if (secondPlayerName == null)
+            {
+                m_OtherPlayer = new Player(Player.k_computerName, eTypeOfPlayer.Computer, eNumberOfPlayer.Second, sizeOfBoard);
+            }
+            else
+            {
+                m_OtherPlayer = new Player(secondPlayerName, eTypeOfPlayer.Human, eNumberOfPlayer.Second, sizeOfBoard);
+            }
+            m_MovmentOption = new MovementOptions(r_SizeOfBoard);
         }
 
         private void caclculateResultGame()
@@ -523,11 +537,13 @@
         private class IAChecker
         {
             private CheckerBoard m_TempCloneBoard;
+
             private BoardSquareScore m_ScoresOfBoard=null;
             public const int k_IADepth = 5;
             public IAChecker(CheckerBoard i_CheckerBoard)
             {
                 initializeClassMembers(i_CheckerBoard);
+                
             }
             private void initializeClassMembers(CheckerBoard i_CheckerBoard)
             {

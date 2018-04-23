@@ -11,6 +11,8 @@
         private eTypeOfPlayer m_TypeOfPlayer;
         private eNumberOfPlayer m_NumberOfPlayer;
 
+        public const String k_computerName= "Computer";
+
         public Player(String i_PlayerName, eTypeOfPlayer i_TypeOfPlayer, eNumberOfPlayer i_NumberOfPlayer, eSizeBoard i_BoardSize)
         {
             Score = 0;

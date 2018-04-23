@@ -79,24 +79,20 @@
             return moveFromClient;         
        }
 
-       public static eSizeBoard InitializePlayers(out Player o_FirstPlayer, out Player o_SecondPlayer)
-       {
+       public static void getClientNamesAndTypeOfSecondPlayer(out String o_FirstPlayerName,out String o_SecondPlayerName,out eSizeBoard o_SizeOfBoard)
+        {
             Console.WriteLine("Wellcome to the checker game\nDesigned and developed by Nadav Shalev & Ben Magriso\n");
             Console.WriteLine("Enter Your name and press enter");
-            String firstPlayerName = getValidName();
-            eSizeBoard sizeOfBoard = getSizeBoardFromClient();
-            o_FirstPlayer = new Player(firstPlayerName, eTypeOfPlayer.Human, eNumberOfPlayer.First, sizeOfBoard);
+            o_FirstPlayerName = getValidName();
+            o_SizeOfBoard = getSizeBoardFromClient();
+            o_SecondPlayerName = null;
             eTypeOfPlayer choiseTypeOfPlayer = getTypeOfPlayerFromClient();
-            String secondPlayerName = "computer";
             if (choiseTypeOfPlayer == eTypeOfPlayer.Human)
             {
                 Console.WriteLine("Enter the second name player and press enter");
-                secondPlayerName = getValidName();
+                o_SecondPlayerName = getValidName();
             }
-
-            o_SecondPlayer = new Player(secondPlayerName, choiseTypeOfPlayer, eNumberOfPlayer.Second, sizeOfBoard);
-            return sizeOfBoard;          
-       }
+        }
 
        public static void PrintBoard(Player i_FirstPlayer, Player i_SecondPlayer, int i_Size)
        {            
