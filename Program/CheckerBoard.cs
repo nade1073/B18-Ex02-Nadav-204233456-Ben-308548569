@@ -5,12 +5,14 @@
 
     public class CheckerBoard
     {
-        private eSizeBoard r_SizeOfBoard;
+        private eSizeBoard m_SizeOfBoard;
         private Player m_CurrentPlayer;
         private Player m_OtherPlayer;
         private eGameEndChoice m_GameEndChoice=eGameEndChoice.Continue;
         private eGameStatus m_GameStatus= eGameStatus.ContinueGame;
         private MovementOptions m_MovmentOption;
+        private IAChecker m_LogicIaCheckerGame;
+
 
         private Soldier m_SoliderThatNeedToEatNextTurn;
 
@@ -22,9 +24,9 @@
         {
             Player otherFirstPlayer = i_CloneToThisBoard.m_CurrentPlayer;
             Player otherSecondPlayer = i_CloneToThisBoard.m_OtherPlayer;
-            m_CurrentPlayer = new Player(otherFirstPlayer.PlayerName, otherFirstPlayer.TypeOfPlayer, otherFirstPlayer.NumberOfPlayer, i_CloneToThisBoard.r_SizeOfBoard);
-            m_OtherPlayer = new Player(otherSecondPlayer.PlayerName, otherSecondPlayer.TypeOfPlayer, otherSecondPlayer.NumberOfPlayer, i_CloneToThisBoard.r_SizeOfBoard);
-            r_SizeOfBoard = i_CloneToThisBoard.r_SizeOfBoard;
+            m_CurrentPlayer = new Player(otherFirstPlayer.PlayerName, otherFirstPlayer.TypeOfPlayer, otherFirstPlayer.NumberOfPlayer, i_CloneToThisBoard.m_SizeOfBoard);
+            m_OtherPlayer = new Player(otherSecondPlayer.PlayerName, otherSecondPlayer.TypeOfPlayer, otherSecondPlayer.NumberOfPlayer, i_CloneToThisBoard.m_SizeOfBoard);
+            m_SizeOfBoard = i_CloneToThisBoard.m_SizeOfBoard;
             m_GameEndChoice = i_CloneToThisBoard.m_GameEndChoice;
             m_GameStatus = i_CloneToThisBoard.m_GameStatus;
             m_SoliderThatNeedToEatNextTurn = null;
@@ -46,6 +48,38 @@
             }
         }
 
+        public Player CurrentPlayer
+        {
+            get
+            {
+                return m_CurrentPlayer;
+            }
+        }
+
+        public Player OtherPlayer
+        {
+            get
+            {
+                return m_OtherPlayer;
+            }
+        }
+
+        public eSizeBoard SizeBoard
+        {
+            get
+            {
+                return m_SizeOfBoard;
+            }
+        }
+
+        public Soldier SoliderThatNeedToEatNextTurn
+        {
+            get
+            {
+                return m_SoliderThatNeedToEatNextTurn;
+            }
+        }
+
         public void startGame()
         {
             initializeStartCheckerBoard();
@@ -54,13 +88,13 @@
                 while (m_GameStatus == eGameStatus.ContinueGame)
                 {
                     Ex02.ConsoleUtils.Screen.Clear();
-                    UIUtilities.PrintBoard(m_CurrentPlayer, m_OtherPlayer, (int)r_SizeOfBoard);
+                    UIUtilities.PrintBoard(m_CurrentPlayer, m_OtherPlayer, (int)m_SizeOfBoard);
                     nextTurn();
                     setParamatersForNextTurn();
                 }
 
                 caclculateResultGame();
-                UIUtilities.printResultOnScreen(m_CurrentPlayer, m_OtherPlayer, (int)r_SizeOfBoard);
+                UIUtilities.printResultOnScreen(m_CurrentPlayer, m_OtherPlayer, (int)m_SizeOfBoard);
                 m_GameEndChoice = UIUtilities.getChoiseToContinuteTheGameFromClient();
                 if (m_GameEndChoice == eGameEndChoice.Continue)
                 {
@@ -75,7 +109,7 @@
             eSizeBoard sizeOfBoard;
             UIUtilities.getClientNamesAndTypeOfSecondPlayer(out firstPlayerName, out secondPlayerName, out sizeOfBoard);
             m_CurrentPlayer = new Player(firstPlayerName, eTypeOfPlayer.Human, eNumberOfPlayer.First, sizeOfBoard);
-            r_SizeOfBoard = sizeOfBoard;
+            m_SizeOfBoard = sizeOfBoard;
             if (secondPlayerName == null)
             {
                 m_OtherPlayer = new Player(Player.k_computerName, eTypeOfPlayer.Computer, eNumberOfPlayer.Second, sizeOfBoard);
@@ -84,7 +118,7 @@
             {
                 m_OtherPlayer = new Player(secondPlayerName, eTypeOfPlayer.Human, eNumberOfPlayer.Second, sizeOfBoard);
             }
-            m_MovmentOption = new MovementOptions(r_SizeOfBoard);
+            m_MovmentOption = new MovementOptions(m_SizeOfBoard);
         }
 
         private void caclculateResultGame()
@@ -112,7 +146,7 @@
             }
         }
 
-        private void setParamatersForNextTurn()
+        internal void setParamatersForNextTurn()
         {
             if (m_SoliderThatNeedToEatNextTurn == null)
             {
@@ -148,7 +182,7 @@
             SquareMove playerChoise;
             if (m_CurrentPlayer.TypeOfPlayer == eTypeOfPlayer.Human)
             {
-                playerChoise = generateSquareToMoveHuman(m_CurrentPlayer, r_SizeOfBoard, i_AvailableVaildMoves, i_MustToDoMoves);
+                playerChoise = generateSquareToMoveHuman(m_CurrentPlayer, m_SizeOfBoard, i_AvailableVaildMoves, i_MustToDoMoves);
             }
             else
             {
@@ -160,7 +194,6 @@
 
         private SquareMove generateSquareToMoveComputer(List<SquareMove> i_AvaiableVaildMoves, List<SquareMove> i_MustToDoMoves)
         {
-            IAChecker chekcerCloneToCurrentBoard = new IAChecker(this);
             List<AIMovementScore> avalibaleMovmenetsToCalculate = new List<AIMovementScore>();
             if (i_MustToDoMoves.Count > 0)
             {
@@ -176,8 +209,12 @@
                     avalibaleMovmenetsToCalculate.Add(new AIMovementScore(currentMove));
                 }
             }
+            if(m_LogicIaCheckerGame==null)
+            {
+                m_LogicIaCheckerGame = new IAChecker(SizeBoard);
+            }
 
-            return chekcerCloneToCurrentBoard.IACheckerCalculateNextMove(avalibaleMovmenetsToCalculate);
+            return m_LogicIaCheckerGame.IACheckerCalculateNextMove(this,avalibaleMovmenetsToCalculate);
         }
 
         private SquareMove generateSquareToMoveHuman(Player i_CurrentPlayer, eSizeBoard i_SizeOfBoard, List<SquareMove> i_AvaiableVaildMoves, List<SquareMove> i_MustToDoMoves)
@@ -234,7 +271,7 @@
             return i_AvaiableVaildMoves.Count > 0;
         }
 
-        private List<SquareMove> generateValidMovesOfPlayer(Player i_Player)
+        internal List<SquareMove> generateValidMovesOfPlayer(Player i_Player)
         {
             List<SquareMove> validMoves = new List<SquareMove>();
             foreach (Soldier currentSoldier in i_Player.Soldiers)
@@ -245,7 +282,7 @@
             return validMoves;
         }
 
-        private List<SquareMove> getValidMoveOfSolider(Soldier i_Soldier)
+        internal List<SquareMove> getValidMoveOfSolider(Soldier i_Soldier)
         {
             List<SquareMove> validMoves = new List<SquareMove>();
             switch (i_Soldier.CharRepresent)
@@ -391,7 +428,7 @@
             m_OtherPlayer = tempPlayer;
         }
        
-        private void perfomSoliderAction(SquareMove i_PlayerChoise)
+        internal void perfomSoliderAction(SquareMove i_PlayerChoise)
         {
             foreach (Soldier currentSoldier in m_CurrentPlayer.Soldiers)
             {
@@ -465,8 +502,6 @@
             calculateSquareotherPlayerToRemove(i_PlayerChoise.ToSquare.Row, i_PlayerChoise.FromSquare.Row, ref rowOfOtherPlayerToRemove);
             calculateSquareotherPlayerToRemove(i_PlayerChoise.ToSquare.Col, i_PlayerChoise.FromSquare.Col, ref colOfOtherPlayerToRemove);
             m_OtherPlayer.RemoveSolider(new Square(rowOfOtherPlayerToRemove, colOfOtherPlayerToRemove));
-            //--Added forIA
-            m_CurrentPlayer.RemoveSolider(new Square(rowOfOtherPlayerToRemove, colOfOtherPlayerToRemove));
         }
 
         private void calculateSquareotherPlayerToRemove(char i_ToSquare, char i_FromSquare, ref char io_SquareToCalculate)
@@ -525,168 +560,13 @@
         {
             Player firstPlayer = getPlayer(eNumberOfPlayer.First);
             Player secondPlayer = getPlayer(eNumberOfPlayer.Second);
-            firstPlayer.generateSoliders(eNumberOfPlayer.First, r_SizeOfBoard);
-            secondPlayer.generateSoliders(eNumberOfPlayer.Second, r_SizeOfBoard);
+            firstPlayer.generateSoliders(eNumberOfPlayer.First, m_SizeOfBoard);
+            secondPlayer.generateSoliders(eNumberOfPlayer.Second, m_SizeOfBoard);
             m_CurrentPlayer = firstPlayer;
             m_OtherPlayer = secondPlayer;
             m_GameStatus = eGameStatus.ContinueGame;
             m_SoliderThatNeedToEatNextTurn = null;
             UIUtilities.initializeParameters();
         }
-
-        private class IAChecker
-        {
-            private CheckerBoard m_TempCloneBoard;
-
-            private BoardSquareScore m_ScoresOfBoard=null;
-            public const int k_IADepth = 5;
-            public IAChecker(CheckerBoard i_CheckerBoard)
-            {
-                initializeClassMembers(i_CheckerBoard);
-                
-            }
-            private void initializeClassMembers(CheckerBoard i_CheckerBoard)
-            {
-                m_TempCloneBoard = new CheckerBoard(i_CheckerBoard);
-                if (m_ScoresOfBoard == null)
-                {
-                    m_ScoresOfBoard = new BoardSquareScore(i_CheckerBoard.r_SizeOfBoard);
-                }
-            }
-            public SquareMove IACheckerCalculateNextMove(List<AIMovementScore> i_ListOfAllMovements)
-            {
-                double alpha = Double.NegativeInfinity;
-                double beta = Double.PositiveInfinity;
-                CheckerBoard tempBoard = null;
-                Boolean maxmizingPlayer = true;
-                foreach (AIMovementScore currentMove in i_ListOfAllMovements)
-                {
-                    
-                    performMoveAndSwitchPlayers(m_TempCloneBoard, out tempBoard, currentMove.SquareMove);
-                    currentMove.ScoreOfMove = miniMaxAlgorithem(tempBoard, IAChecker.k_IADepth, !maxmizingPlayer, alpha,beta);
-                    currentMove.ScoreInBoard = m_ScoresOfBoard.ArrayOfScores[currentMove.ToSquare.Row - 'a',currentMove.ToSquare.Col-'A'];
-                }
-                double maxHeuristics = Double.NegativeInfinity;
-                foreach (AIMovementScore currentMove in i_ListOfAllMovements)
-                {
-                    if(currentMove.ScoreOfMove > maxHeuristics)
-                    {
-                        maxHeuristics = currentMove.ScoreOfMove;
-                    }
-                }
-                i_ListOfAllMovements.RemoveAll(item => item.ScoreOfMove < maxHeuristics);
-                int maxOfScoreInBoard = 0;
-                if(i_ListOfAllMovements.Count>0)
-                {
-                    foreach (AIMovementScore currentMove in i_ListOfAllMovements)
-                    {
-                        if (currentMove.ScoreInBoard > maxOfScoreInBoard)
-                        {
-                            maxOfScoreInBoard = currentMove.ScoreInBoard;
-                        }
-                    }
-                }
-                Random rand = new Random();
-                i_ListOfAllMovements.RemoveAll(item => item.ScoreInBoard < maxOfScoreInBoard);
-                int randomIndex = rand.Next(i_ListOfAllMovements.Count);
-                return i_ListOfAllMovements[randomIndex].SquareMove;
-            }
-            private double getHeuristic(CheckerBoard i_Board)
-            {
-                double kingWeight = 1.3;
-                double result = 0;
-
-                if(i_Board.m_CurrentPlayer.TypeOfPlayer==eTypeOfPlayer.Computer)
-                {
-                    result = i_Board.m_CurrentPlayer.getNumberOfSpesificSoldierType(eSoldierType.King) * kingWeight + i_Board.m_CurrentPlayer.getNumberOfSpesificSoldierType(eSoldierType.Regular) - i_Board.m_OtherPlayer.getNumberOfSpesificSoldierType(eSoldierType.King) * kingWeight - i_Board.m_OtherPlayer.getNumberOfSpesificSoldierType(eSoldierType.Regular);
-                }
-                else
-                {
-                    result = i_Board.m_OtherPlayer.getNumberOfSpesificSoldierType(eSoldierType.King) * kingWeight + i_Board.m_OtherPlayer.getNumberOfSpesificSoldierType(eSoldierType.Regular) - i_Board.m_CurrentPlayer.getNumberOfSpesificSoldierType(eSoldierType.King) * kingWeight - i_Board.m_CurrentPlayer.getNumberOfSpesificSoldierType(eSoldierType.Regular);
-                }
-               
-                return result;
-
-            }
-            private Double miniMaxAlgorithem(CheckerBoard i_Board, int i_Depth,bool i_MaxmizingPlayer, double i_Alpha, double i_Beta)
-            {
-                if (i_Depth == 0)
-                {
-                    return getHeuristic(i_Board);
-                }
-                List<SquareMove> availableVaildMoves;
-                if (i_Board.m_SoliderThatNeedToEatNextTurn == null)
-                {
-                   availableVaildMoves = i_Board.generateValidMovesOfPlayer(i_Board.m_CurrentPlayer);
-                }
-                else
-                {
-                    availableVaildMoves = i_Board.getValidMoveOfSolider(i_Board.m_SoliderThatNeedToEatNextTurn);
-                }
-                double initial=0;
-                CheckerBoard tempBoard = null;
-
-                if(i_MaxmizingPlayer)
-                {
-                    initial = Double.NegativeInfinity;
-                    foreach (SquareMove currentMove in availableVaildMoves)
-                    {
-                        double result = 0;
-                        performMoveAndSwitchPlayers(i_Board, out tempBoard, currentMove);
-                        if (tempBoard.m_SoliderThatNeedToEatNextTurn != null)
-                        {
-                            result = miniMaxAlgorithem(tempBoard, i_Depth - 1, i_MaxmizingPlayer, i_Alpha, i_Beta);
-                        }
-                        else
-                        {
-                            result = miniMaxAlgorithem(tempBoard, i_Depth - 1, !i_MaxmizingPlayer, i_Alpha, i_Beta);
-                        }
-                        initial = Math.Max(result, initial);
-                        i_Alpha = Math.Max(i_Alpha, initial);
-                        if (i_Alpha >= i_Beta)
-                        {
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    initial = Double.PositiveInfinity;
-                    foreach (SquareMove currentMove in availableVaildMoves)
-                    {
-                        double result = 0;
-                        performMoveAndSwitchPlayers(i_Board, out tempBoard, currentMove);
-                        if (tempBoard.m_SoliderThatNeedToEatNextTurn != null)
-                        {
-                            result = miniMaxAlgorithem(tempBoard, i_Depth - 1, i_MaxmizingPlayer, i_Alpha, i_Beta);
-                        }
-                        else
-                        {
-                            result = miniMaxAlgorithem(tempBoard, i_Depth - 1, !i_MaxmizingPlayer, i_Alpha, i_Beta);
-                        }
-                        initial = Math.Min(result, initial);
-                        i_Beta = Math.Min(i_Beta, initial);
-                        if (i_Alpha >= i_Beta)
-                        {
-                            break;
-                        }
-                    }
-
-                }
-                return initial;
-            }
-            private void performMoveAndSwitchPlayers(CheckerBoard i_Original,out CheckerBoard o_CopyOfCheckerBoard,SquareMove i_SquareToMoveInNewBoard)
-            {
-                o_CopyOfCheckerBoard = new CheckerBoard(i_Original);
-                o_CopyOfCheckerBoard.perfomSoliderAction(i_SquareToMoveInNewBoard);
-                if (o_CopyOfCheckerBoard.m_SoliderThatNeedToEatNextTurn == null)
-                {
-                    Player tempPlayer = o_CopyOfCheckerBoard.m_CurrentPlayer;
-                    o_CopyOfCheckerBoard.m_CurrentPlayer = o_CopyOfCheckerBoard.m_OtherPlayer;
-                    o_CopyOfCheckerBoard.m_OtherPlayer = tempPlayer;
-                }
-            }
-        }
-
     }
 }
