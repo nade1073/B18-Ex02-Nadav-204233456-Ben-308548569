@@ -5,13 +5,12 @@
 
     public class Player
     {
+        public const String k_computerName = "Computer";
         private int m_Score;
         private String m_PlayerName;
         private List<Soldier> m_Soldiers;
         private eTypeOfPlayer m_TypeOfPlayer;
         private eNumberOfPlayer m_NumberOfPlayer;
-
-        public const String k_computerName= "Computer";
 
         public Player(String i_PlayerName, eTypeOfPlayer i_TypeOfPlayer, eNumberOfPlayer i_NumberOfPlayer, eSizeBoard i_BoardSize)
         {
@@ -21,6 +20,32 @@
             NumberOfPlayer = i_NumberOfPlayer;
             Soldiers = new List<Soldier>();
             generateSoliders(i_NumberOfPlayer, i_BoardSize);
+        }
+
+        public eNumberOfPlayer NumberOfPlayer
+        {
+            get
+            {
+                return m_NumberOfPlayer;
+            }
+
+            set
+            {
+                m_NumberOfPlayer = value;
+            }
+        }
+
+        public eTypeOfPlayer TypeOfPlayer
+        {
+            get
+            {
+                return m_TypeOfPlayer;
+            }
+
+            set
+            {
+                m_TypeOfPlayer = value;
+            }
         }
 
         public int Score
@@ -62,47 +87,8 @@
             }
         }
 
-        public int getNumberOfSpesificSoldierType(eSoldierType i_Type)
-        {
-            int count = 0;
-            foreach (Soldier currentSoldier in m_Soldiers)
-            {
-                if (currentSoldier.TypeOfSoldier == i_Type)
-                {
-                    count++;
-                }
-            }
-            return count;
-        }
-
-        public eNumberOfPlayer NumberOfPlayer
-        {
-            get
-            {
-                return m_NumberOfPlayer;
-            }
-
-            set
-            {
-                m_NumberOfPlayer = value;
-            }
-        }
-
-        public eTypeOfPlayer TypeOfPlayer
-        {
-            get
-            {
-                return m_TypeOfPlayer;
-            }
-
-            set
-            {
-                m_TypeOfPlayer = value;
-            }
-        }
-
         public static bool isPlayerNameValid(String i_PlayerName)
-        {        
+        {
             bool isProperName = true;
             if (i_PlayerName.Length > 20)
             {
@@ -115,6 +101,20 @@
             }
 
             return isProperName;
+        }
+
+        public int getNumberOfSpesificSoldierType(eSoldierType i_Type)
+        {
+            int count = 0;
+            foreach (Soldier currentSoldier in m_Soldiers)
+            {
+                if (currentSoldier.TypeOfSoldier == i_Type)
+                {
+                    count++;
+                }
+            }
+
+            return count;
         }
 
         public void generateSoliders(eNumberOfPlayer i_NumberOfPlayer, eSizeBoard i_BoardSize)

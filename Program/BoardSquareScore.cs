@@ -1,24 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Program
+﻿namespace Program
 {
     public class BoardSquareScore
     {
-    
         private readonly int[,] m_ArrayOfScore;
+
         public BoardSquareScore(eSizeBoard i_SizeOfBoard)
         {
-            m_ArrayOfScore=generateArray(i_SizeOfBoard);
+            m_ArrayOfScore = generateArray(i_SizeOfBoard);
         }
+
+        public int[,] ArrayOfScores
+        {
+            get
+            {
+                return m_ArrayOfScore;
+            }
+        }
+
         private int[,] generateArray(eSizeBoard i_SizeOfBoard)
         {
             int sizeOfBoardInteger = (int)i_SizeOfBoard;
             int[,] returnedArr = new int[sizeOfBoardInteger, sizeOfBoardInteger];
-
             int maxScore = sizeOfBoardInteger / 2;
 
             for (int i = 0; i < sizeOfBoardInteger / 2; i++)
@@ -33,25 +35,13 @@ namespace Program
                     returnedArr[sizeOfBoardInteger - 1, j + 1] = 0;
                     returnedArr[j, sizeOfBoardInteger - 1] = maxScore;
                     returnedArr[j + 1, sizeOfBoardInteger - 1] = 0;
-
-
                 }
+
                 maxScore--;
                 sizeOfBoardInteger--;
-
             }
 
             return returnedArr;
-
-        }
-
-        public int[,] ArrayOfScores
-        {
-            get
-            {
-                return m_ArrayOfScore;
-            }
-        }
-        
+        }   
     }
 }

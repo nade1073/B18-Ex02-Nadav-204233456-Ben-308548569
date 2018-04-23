@@ -79,7 +79,7 @@
             return moveFromClient;         
        }
 
-       public static void getClientNamesAndTypeOfSecondPlayer(out String o_FirstPlayerName,out String o_SecondPlayerName,out eSizeBoard o_SizeOfBoard)
+       public static void getClientNamesAndTypeOfSecondPlayer(out String o_FirstPlayerName, out String o_SecondPlayerName, out eSizeBoard o_SizeOfBoard)
         {
             Console.WriteLine("Wellcome to the checker game\nDesigned and developed by Nadav Shalev & Ben Magriso\n");
             Console.WriteLine("Enter Your name and press enter");
